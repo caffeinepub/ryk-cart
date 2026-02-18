@@ -1,0 +1,183 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-create-a-daraz-like-e-commerce-web-app-called-ryk-cart-with-core-browsing-and-shopping-flows-product-listing-product-details-cart-management-and-order-placement",
+      "featureTitle": "Create a Daraz-like e-commerce web app called \"Ryk cart\" with core browsing and shopping flows: product listing, product details, cart management, and order placement.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/layout/AppShell.tsx",
+        "frontend/src/hooks/useCart.ts",
+        "frontend/src/hooks/useProducts.ts",
+        "frontend/src/pages/CartPage.tsx",
+        "frontend/src/pages/CatalogPage.tsx",
+        "frontend/src/pages/CheckoutPage.tsx",
+        "frontend/src/pages/OrderConfirmationPage.tsx",
+        "frontend/src/pages/OrderHistoryPage.tsx",
+        "frontend/src/pages/ProductDetailsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-internet-identity-sign-in-and-require-authentication-for-placing-orders-and-viewing-loyalty-points-and-order-history",
+      "featureTitle": "Add Internet Identity sign-in and require authentication for placing orders and viewing loyalty points and order history.",
+      "files": [
+        "frontend/src/components/auth/AuthGate.tsx",
+        "frontend/src/components/auth/LoginButton.tsx",
+        "frontend/src/components/auth/ProfileSetupDialog.tsx",
+        "frontend/src/components/layout/AppShell.tsx",
+        "frontend/src/pages/CheckoutPage.tsx",
+        "frontend/src/pages/OrderHistoryPage.tsx",
+        "frontend/src/pages/RewardsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-a-whatsapp-based-complaints-support-entry-point-that-opens-whatsapp-chat-to-phone-number-03280941320-with-a-prefilled-message-template",
+      "featureTitle": "Implement a WhatsApp-based complaints/support entry point that opens WhatsApp chat to phone number 03280941320 with a prefilled message template.",
+      "files": [
+        "frontend/src/components/SupportWhatsAppLink.tsx",
+        "frontend/src/components/layout/AppShell.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-a-loyalty-points-system-award-points-for-each-completed-purchase-and-display-the-user-s-current-points-balance",
+      "featureTitle": "Implement a loyalty points system: award points for each completed purchase and display the user’s current points balance.",
+      "files": [
+        "frontend/src/components/layout/AccountSummary.tsx",
+        "frontend/src/components/layout/AppShell.tsx",
+        "frontend/src/pages/CheckoutPage.tsx",
+        "frontend/src/pages/RewardsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-redemption-at-20-points-when-a-user-reaches-at-least-20-points-allow-redeeming-exactly-20-points-for-either-a-cashback-reward-or-b-mystery-box-gift-and-record-the-redemption-in-user-history",
+      "featureTitle": "Add redemption at 20 points: when a user reaches at least 20 points, allow redeeming exactly 20 points for either (A) cashback reward or (B) mystery box gift, and record the redemption in user history.",
+      "files": [
+        "frontend/src/pages/RewardsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-an-admin-only-product-management-interface-to-create-edit-and-deactivate-products-including-name-price-description-category-stock-and-images-without-external-services",
+      "featureTitle": "Add an admin-only product management interface to create, edit, and deactivate products (including name, price, description, category, stock, and images) without external services.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/auth/AdminGate.tsx",
+        "frontend/src/pages/AdminProductsPage.tsx",
+        "frontend/src/pages/CatalogPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-apply-a-coherent-distinctive-visual-theme-not-daraz-copy-across-all-pages-including-typography-spacing-and-component-styling-while-keeping-the-ui-marketplace-friendly",
+      "featureTitle": "Apply a coherent, distinctive visual theme (not Daraz-copy) across all pages, including typography, spacing, and component styling, while keeping the UI marketplace-friendly.",
+      "files": [
+        "frontend/src/components/layout/AppShell.tsx",
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-generated-static-brand-and-ui-images-and-render-them-in-the-ui-store-them-under-frontend-public-assets-generated",
+      "featureTitle": "Add generated static brand and UI images and render them in the UI (store them under frontend/public/assets/generated).",
+      "files": [
+        "frontend/src/components/layout/AppShell.tsx",
+        "frontend/src/pages/CatalogPage.tsx",
+        "frontend/src/pages/RewardsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

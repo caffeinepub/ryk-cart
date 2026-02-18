@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 0.625rem;
+        --background: 0.99 0 0;
+        --foreground: 0.15 0 0;
+        --card: 1 0 0;
+        --card-foreground: 0.15 0 0;
+        --popover: 1 0 0;
+        --popover-foreground: 0.15 0 0;
+        --primary: 0.55 0.18 35;
+        --primary-foreground: 0.99 0 0;
+        --secondary: 0.96 0.02 85;
+        --secondary-foreground: 0.15 0 0;
+        --muted: 0.96 0.01 85;
+        --muted-foreground: 0.50 0.01 85;
+        --accent: 0.94 0.03 65;
+        --accent-foreground: 0.15 0 0;
+        --destructive: 0.55 0.22 25;
+        --destructive-foreground: 0.99 0 0;
+        --border: 0.90 0.01 85;
+        --input: 0.90 0.01 85;
+        --ring: 0.55 0.18 35;
+        --chart-1: 0.60 0.20 35;
+        --chart-2: 0.65 0.15 65;
+        --chart-3: 0.50 0.18 25;
+        --chart-4: 0.70 0.12 85;
+        --chart-5: 0.55 0.16 45;
+    }
+
+    .dark {
+        --background: 0.12 0.01 35;
+        --foreground: 0.98 0.01 85;
+        --card: 0.15 0.01 35;
+        --card-foreground: 0.98 0.01 85;
+        --popover: 0.12 0.01 35;
+        --popover-foreground: 0.98 0.01 85;
+        --primary: 0.70 0.18 45;
+        --primary-foreground: 0.12 0.01 35;
+        --secondary: 0.20 0.02 35;
+        --secondary-foreground: 0.98 0.01 85;
+        --muted: 0.20 0.02 35;
+        --muted-foreground: 0.65 0.02 65;
+        --accent: 0.25 0.03 45;
+        --accent-foreground: 0.98 0.01 85;
+        --destructive: 0.60 0.22 25;
+        --destructive-foreground: 0.98 0.01 85;
+        --border: 0.25 0.02 35;
+        --input: 0.25 0.02 35;
+        --ring: 0.70 0.18 45;
+        --chart-1: 0.65 0.20 45;
+        --chart-2: 0.70 0.15 65;
+        --chart-3: 0.55 0.18 25;
+        --chart-4: 0.75 0.12 85;
+        --chart-5: 0.60 0.16 55;
+    }
+
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+        font-feature-settings: "rlig" 1, "calt" 1;
+    }
+}

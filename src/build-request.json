@@ -1,0 +1,181 @@
+{
+  "kind": "build_request",
+  "title": "Build 'Ryk cart' e-commerce site with WhatsApp support and loyalty rewards",
+  "projectName": "Ryk cart",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Create a Daraz-like e-commerce web app called \"Ryk cart\" with core browsing and shopping flows: product listing, product details, cart management, and order placement.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "mujhy ryk cart ky name sy daraz jaisi working website chahiya"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Users can browse a product catalog with categories and search.",
+        "Users can open a product detail page with images, price, description, and an Add to Cart action.",
+        "Users can view and edit the cart (change quantity, remove items) and see subtotal/total.",
+        "Users can place an order (no external payment required) and receive an order confirmation.",
+        "Placed orders are persisted per authenticated user and visible in an Order History screen."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Add Internet Identity sign-in and require authentication for placing orders and viewing loyalty points and order history.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Unauthenticated users can browse products and view product details.",
+        "Attempting to place an order prompts the user to sign in with Internet Identity.",
+        "After sign-in, the user can access Order History and Loyalty/Rewards pages."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Implement a WhatsApp-based complaints/support entry point that opens WhatsApp chat to phone number 03280941320 with a prefilled message template.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "agar koi complaint to to wo mujhy whatsapp kr sktyn hyn 03280941320"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A visible \"Support / Complaints\" UI entry exists (e.g., header and/or footer).",
+        "Clicking the entry opens WhatsApp (wa.me link) to 03280941320.",
+        "The WhatsApp link includes a prefilled English message (e.g., \"Hello Ryk cart support, I need help with my order...\")."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Implement a loyalty points system: award points for each completed purchase and display the user’s current points balance.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "hr product purchase krnay pr unhyn points milyngy"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When an order is placed successfully, the user earns points according to a clearly defined rule (documented in UI, e.g., 1 point per product item purchased).",
+        "The user can view current points in a Loyalty/Rewards screen and in a small summary badge (e.g., in account menu).",
+        "Points balance is persisted and remains correct after refresh and re-login."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Add redemption at 20 points: when a user reaches at least 20 points, allow redeeming exactly 20 points for either (A) cashback reward or (B) mystery box gift, and record the redemption in user history.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "jb 20 points mukml hongay to unhy kuch cashback or myster box gift milyga"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When points >= 20, the Rewards screen shows two redeem options: \"Cashback\" and \"Mystery Box\".",
+        "Redeeming deducts exactly 20 points from the user balance and creates a redemption record with type, timestamp, and status.",
+        "If points < 20, redeem actions are disabled with a clear explanation (in English).",
+        "Users can view a list of past redemptions (history) in the Loyalty/Rewards area."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Add an admin-only product management interface to create, edit, and deactivate products (including name, price, description, category, stock, and images) without external services.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "There is an Admin section accessible only to an allowlisted admin principal (configured in backend).",
+        "Admin can create and update products and set them active/inactive.",
+        "Inactive products do not appear in the public catalog.",
+        "Product changes persist across refreshes."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Apply a coherent, distinctive visual theme (not Daraz-copy) across all pages, including typography, spacing, and component styling, while keeping the UI marketplace-friendly.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "kuch different rkhny hyn us my"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A consistent color palette, typography scale, and layout system is used across the app.",
+        "Key pages (Home/Catalog, Product Detail, Cart, Checkout/Place Order, Account, Loyalty/Rewards, Admin) share consistent navigation and visual hierarchy.",
+        "Theme avoids using a blue+purple primary combination unless explicitly requested later."
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Add generated static brand and UI images and render them in the UI (store them under frontend/public/assets/generated).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Generated images exist in frontend/public/assets/generated and are referenced by the UI (e.g., logo in header, hero banner on home).",
+        "The UI works without fetching images from the backend."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor (all logic in backend/main.mo).",
+    "Use Internet Identity as the only authentication method.",
+    "Do not edit files under frontend/src/components/ui or other immutable paths; compose UI from those components instead.",
+    "Use English for all user-facing UI text."
+  ],
+  "nonGoals": [
+    "Real payment processing or external payment gateways.",
+    "Vendor marketplace onboarding (multiple seller accounts) unless requested later.",
+    "Real-time chat/support system; support is via WhatsApp link only.",
+    "Integration with external databases or third-party APIs."
+  ],
+  "imageRequirements": {
+    "required": [
+      "Minimal cart + lightning bolt logo mark, flat vector style (ryk-cart-logo.dim_512x512.png)",
+      "Wide hero banner illustration for an online shopping storefront, warm modern palette (ryk-cart-hero.dim_1600x600.png)",
+      "Set of 6 category icons (electronics, fashion, groceries, beauty, home, toys), consistent line/flat style (ryk-cart-category-icons.dim_512x512.png)",
+      "Mystery box gift illustration, playful but clean (ryk-cart-mystery-box.dim_800x800.png)"
+    ],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [
+      "User prefers Urdu instructions but requires English UI/build-request text."
+    ],
+    "preferencesToRemove": [],
+    "miscToAdd": [
+      "Support WhatsApp number: 03280941320"
+    ],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
+  }
+}

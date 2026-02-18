@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Build an e-commerce website similar to Daraz, named \"Ryk cart\", with WhatsApp-based complaints/support and a purchase-based loyalty points system that rewards users at 20 points with cashback or a mystery box gift.",
+  "architectural_notes": [
+    "Provide a WhatsApp contact link/button for complaints/support using the provided phone number.",
+    "Design a loyalty points ledger and redemption rule triggered at 20 points (cashback or mystery box reward)."
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Minimal cart + lightning bolt logo mark, flat vector style (ryk-cart-logo.dim_512x512.png)\n- Wide hero banner illustration for an online shopping storefront, warm modern palette (ryk-cart-hero.dim_1600x600.png)\n- Set of 6 category icons (electronics, fashion, groceries, beauty, home, toys), consistent line/flat style (ryk-cart-category-icons.dim_512x512.png)\n- Mystery box gift illustration, playful but clean (ryk-cart-mystery-box.dim_800x800.png)",
+  "existing_features": [
+    {
+      "id": "feature-create-a-daraz-like-e-commerce-web-app-called-ryk-cart-with-core-browsing-and-shopping-flows-product-listing-product-details-cart-management-and-order-placement",
+      "title": "Create a Daraz-like e-commerce web app called \"Ryk cart\" with core browsing and shopping flows: product listing, product details, cart management, and order placement.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-internet-identity-sign-in-and-require-authentication-for-placing-orders-and-viewing-loyalty-points-and-order-history",
+      "title": "Add Internet Identity sign-in and require authentication for placing orders and viewing loyalty points and order history.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-whatsapp-based-complaints-support-entry-point-that-opens-whatsapp-chat-to-phone-number-03280941320-with-a-prefilled-message-template",
+      "title": "Implement a WhatsApp-based complaints/support entry point that opens WhatsApp chat to phone number 03280941320 with a prefilled message template.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-loyalty-points-system-award-points-for-each-completed-purchase-and-display-the-user-s-current-points-balance",
+      "title": "Implement a loyalty points system: award points for each completed purchase and display the user’s current points balance.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-redemption-at-20-points-when-a-user-reaches-at-least-20-points-allow-redeeming-exactly-20-points-for-either-a-cashback-reward-or-b-mystery-box-gift-and-record-the-redemption-in-user-history",
+      "title": "Add redemption at 20 points: when a user reaches at least 20 points, allow redeeming exactly 20 points for either (A) cashback reward or (B) mystery box gift, and record the redemption in user history.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-admin-only-product-management-interface-to-create-edit-and-deactivate-products-including-name-price-description-category-stock-and-images-without-external-services",
+      "title": "Add an admin-only product management interface to create, edit, and deactivate products (including name, price, description, category, stock, and images) without external services.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-coherent-distinctive-visual-theme-not-daraz-copy-across-all-pages-including-typography-spacing-and-component-styling-while-keeping-the-ui-marketplace-friendly",
+      "title": "Apply a coherent, distinctive visual theme (not Daraz-copy) across all pages, including typography, spacing, and component styling, while keeping the UI marketplace-friendly.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-generated-static-brand-and-ui-images-and-render-them-in-the-ui-store-them-under-frontend-public-assets-generated",
+      "title": "Add generated static brand and UI images and render them in the UI (store them under frontend/public/assets/generated).",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Create a Daraz-like working e-commerce website (marketplace-style shopping experience)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Add complaints/support option that lets users contact via WhatsApp (03280941320)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Implement loyalty points awarded per product purchase",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Add rewards redemption at 20 points (cashback or mystery box gift)",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Ryk cart",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

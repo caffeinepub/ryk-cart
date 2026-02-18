@@ -1,0 +1,23 @@
+{
+  "frontend/src/App.tsx": "Main application component with TanStack Router setup defining all routes (catalog, product details, cart, checkout, order confirmation, order history, rewards, admin) wrapped in AppShell layout.",
+  "frontend/src/components/layout/AppShell.tsx": "Shared application layout with sticky header (logo, navigation, support link, cart, login/account), main content area, and footer with attribution and links.",
+  "frontend/src/components/layout/AccountSummary.tsx": "Dropdown menu component showing authenticated user's name, points balance with badge when redeemable, and navigation to orders/rewards with logout option, with proper bigint to number conversion.",
+  "frontend/src/components/auth/LoginButton.tsx": "Simple login button component that triggers Internet Identity authentication with loading state.",
+  "frontend/src/components/auth/ProfileSetupDialog.tsx": "Modal dialog that appears on first login to collect user's name for profile setup, preventing dismissal until completed.",
+  "frontend/src/components/auth/AuthGate.tsx": "Wrapper component that requires authentication, showing a login prompt card when user is not authenticated.",
+  "frontend/src/components/auth/AdminGate.tsx": "Wrapper component that checks admin permissions and shows access denied message for non-admin users.",
+  "frontend/src/components/SupportWhatsAppLink.tsx": "Button component that opens WhatsApp chat to support number with prefilled message template.",
+  "frontend/src/pages/CatalogPage.tsx": "Product catalog page with hero banner, search, category filtering, and grid of product cards showing active products only.",
+  "frontend/src/pages/ProductDetailsPage.tsx": "Product detail page with image carousel, quantity selector, add to cart functionality, and points earning preview.",
+  "frontend/src/pages/CartPage.tsx": "Shopping cart page showing cart items with quantity controls, remove option, order summary, and checkout button (auth required).",
+  "frontend/src/pages/CheckoutPage.tsx": "Checkout page displaying order review with items, totals, points to be earned, and place order button (auth required).",
+  "frontend/src/pages/OrderConfirmationPage.tsx": "Order confirmation page shown after successful order placement with next action buttons.",
+  "frontend/src/pages/OrderHistoryPage.tsx": "Order history page with placeholder alert explaining the feature requires backend API support (auth required).",
+  "frontend/src/pages/RewardsPage.tsx": "Loyalty rewards page showing points balance, redemption options (cashback/mystery box) enabled at 20 points, and redemption history placeholder (auth required), with proper bigint to number conversion.",
+  "frontend/src/pages/AdminProductsPage.tsx": "Admin product management page with table of all products and dialog form to create/edit products and toggle active status (admin only).",
+  "frontend/src/hooks/useProducts.ts": "React Query hooks for product operations (getAllProducts, getProduct, createProduct, updateProduct, toggleProductActive) with cache invalidation.",
+  "frontend/src/hooks/useCart.ts": "React Query hooks for cart operations (getCart, addToCart, removeFromCart, placeOrder) with cache invalidation for cart and points.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for user profile, admin check, points balance, and points redemption with proper authentication guards and cache management.",
+  "frontend/src/index.css": "Global styles with warm orange/amber OKLCH color palette for light and dark modes, avoiding blue/purple combinations.",
+  "frontend/tailwind.config.js": "Tailwind configuration with extended color tokens, Inter font family, and custom design system settings."
+}
