@@ -1,15 +1,63 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T03:39:18.308Z",
-  "summary": "Diff appears to implement all three requested frontend UX improvements: an admin-aware empty state on the Catalog page when there are zero active products (REQ-9), an always-available “How to add products” help entry point on the Admin Products page (REQ-10), and clearer loading vs empty states in the Admin Products table area (REQ-11). No unrequested major features are clearly evidenced in the diff summary.",
-  "missing_requirements": [],
-  "hallucinated_features": [],
-  "confidence": 0.68,
+  "generatedAt": "2026-02-18T05:14:54.851Z",
+  "summary": "Diff implements a new frontend AdminGate with II login prompt, Access Denied diagnostics, and a password-only bootstrap claim flow, plus new backend migration state for a bootstrapClaimed flag. However, backend bootstrap logic does not actually grant admin privileges (it traps unless caller is already admin) and bootstrap availability does not depend on whether any effective admin exists. Additionally, the requested admin password-unlock step for already-recognized admins is not evidenced in the diff, and the WhatsApp phone number appears to be implemented in international format rather than the specified local number.",
+  "missing_requirements": [
+    {
+      "id": "REQ-27",
+      "requirement": "When visiting /admin while signed in and recognized as an admin by the backend, the admin password unlock form is shown, and after entering the correct password (miang275@) the Admin Products panel is displayed.",
+      "reason": "The diff evidence shows AdminGate checks backend isAdmin and either shows Access Denied / bootstrap claim or allows access; it does not show an admin password unlock screen for already-recognized admins, nor a flow that gates the Admin Products panel behind entering miang275@ for admins.",
+      "evidence": [
+        "frontend/src/components/auth/AdminGate.tsx",
+        "frontend-file-summaries.txt (AdminGate description)"
+      ]
+    },
+    {
+      "id": "REQ-29",
+      "requirement": "Backend bootstrap availability/admin recognition: if no effective admin exists, bootstrap is available; claiming bootstrap immediately grants the caller admin permissions that satisfy isCallerAdmin and admin-only mutations; bootstrap availability must not be blocked by stale/incorrect adminInitialized state.",
+      "reason": "Backend requestBootstrap sets bootstrapClaimed := true but then traps unless AccessControl.isAdmin(caller) is already true, so it does not grant admin privileges to a non-admin caller. Also isBootstrapAvailable simply returns not bootstrapClaimed and does not check whether an effective admin exists (or any admin configuration) and does not address stale adminInitialized logic beyond removing it in migration.",
+      "evidence": [
+        "backend/main.mo",
+        "backend/migration.mo"
+      ]
+    },
+    {
+      "id": "REQ-30",
+      "requirement": "WhatsApp support CTA must open WhatsApp chat to phone number 03280941320 with a prefilled message containing the Principal ID.",
+      "reason": "SupportWhatsAppLink uses phoneNumber = '923280941320' rather than the explicitly specified '03280941320'. The diff does not conclusively show that the WhatsApp message always includes the Principal ID (it depends on whether AdminGate passes a custom message; the component default message does not include the principal).",
+      "evidence": [
+        "frontend/src/components/SupportWhatsAppLink.tsx",
+        "frontend/src/components/auth/AdminGate.tsx (truncated)"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Added/changed a user profile system (getCallerUserProfile/saveCallerUserProfile, ProfileSetupDialog, AccountSummary changes).",
+      "reason": "Not requested by REQ-27..REQ-30; the build request focuses on /admin gating/bootstrap and Access Denied diagnostics.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend-file-summaries.txt (ProfileSetupDialog, AccountSummary, useQueries user profile hooks)",
+        "frontend/src/hooks/useQueries.ts"
+      ]
+    },
+    {
+      "description": "Made broader e-commerce UI/logic changes unrelated to admin gating (catalog empty state admin guidance, cart/checkout points-to-earn calculations, rewards/order history placeholders, admin products page enhancements).",
+      "reason": "Not requested by REQ-27..REQ-30; these changes go beyond fixing /admin access denied and bootstrap claim flow.",
+      "evidence": [
+        "frontend-file-summaries.txt (CatalogPage, CartPage, CheckoutPage, RewardsPage, OrderHistoryPage, AdminProductsPage)"
+      ]
+    }
+  ],
+  "confidence": 0.72,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/pages/AdminProductsPage.tsx",
-    "frontend/src/pages/CatalogPage.tsx",
+    "frontend/src/components/SupportWhatsAppLink.tsx",
+    "frontend/src/components/auth/AdminGate.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json"
   ]
 }

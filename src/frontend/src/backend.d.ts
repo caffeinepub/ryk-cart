@@ -31,6 +31,7 @@ export interface Product {
     stock: bigint;
     category: string;
     price: bigint;
+    points: bigint;
 }
 export enum UserRole {
     admin = "admin",
@@ -40,19 +41,22 @@ export enum UserRole {
 export interface backendInterface {
     addToCart(productId: ProductId, quantity: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createProduct(name: string, price: bigint, description: string, category: string, stock: bigint, imageUrls: Array<string>): Promise<ProductId>;
+    createProduct(name: string, price: bigint, description: string, category: string, stock: bigint, imageUrls: Array<string>, points: bigint): Promise<ProductId>;
     getAllProducts(): Promise<Array<Product>>;
+    getCallerPrincipal(): Promise<string>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getCart(): Promise<Array<CartItem>>;
     getPointsBalance(): Promise<bigint>;
     getProduct(productId: ProductId): Promise<Product>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    isBootstrapAvailable(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     placeOrder(): Promise<void>;
     redeemPoints(reward: RedemptionType): Promise<void>;
     removeFromCart(productId: ProductId): Promise<void>;
+    requestBootstrap(): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     toggleProductActive(productId: ProductId): Promise<void>;
-    updateProduct(productId: ProductId, name: string, price: bigint, description: string, category: string, stock: bigint, imageUrls: Array<string>, isActive: boolean): Promise<void>;
+    updateProduct(productId: ProductId, name: string, price: bigint, description: string, category: string, stock: bigint, imageUrls: Array<string>, isActive: boolean, points: bigint): Promise<void>;
 }

@@ -1,13 +1,20 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
+  "projectStateVersion": 17,
   "summary": "Build an e-commerce website similar to Daraz, named \"Ryk cart\", with WhatsApp-based complaints/support and a purchase-based loyalty points system that rewards users at 20 points with cashback or a mystery box gift.",
   "architectural_notes": [
     "Provide a WhatsApp contact link/button for complaints/support using the provided phone number.",
-    "Design a loyalty points ledger and redemption rule triggered at 20 points (cashback or mystery box reward)."
+    "Design a loyalty points ledger and redemption rule triggered at 20 points (cashback or mystery box reward).",
+    "Admin access to product management should be protected by a simple password gate (password: miang275@) rather than full external auth.",
+    "User requested making admin access password-only (miang275@) and not blocked by Internet Identity/backend admin checks, so the admin login/unlock screen is always reachable.",
+    "Admin panel login must be password-only using \"miang275@\"; remove any username requirement and remove/disable any other login method for admin access."
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "Admin login/unlock entry point is not visible to the user (admin login screen not showing).",
+    "Admin panel currently shows 'Access Denied' for the user; admin unlock/password screen is not reachable.",
+    "User reports /admin still shows \"Access Denied\" (even after Version 7 / single-password admin login deployment)."
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-create-a-daraz-like-e-commerce-web-app-called-ryk-cart-with-core-browsing-and-shopping-flows-product-listing-product-details-cart-management-and-order-placement",
@@ -96,6 +103,134 @@
         "REQ-11"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-password-based-admin-unlock-flow-for-the-admin-area-so-an-admin-must-enter-the-password-miang275-before-accessing-product-management",
+      "title": "Add a password-based admin unlock flow for the Admin area so an admin must enter the password \"miang275@\" before accessing product management.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-keep-the-existing-internet-identity-admin-authorization-checks-in-place-so-that-password-unlock-alone-is-not-sufficient-to-perform-admin-mutations-admin-product-mutations-must-still-require-the-backend-to-recognize-the-caller-as-an-admin",
+      "title": "Keep the existing Internet Identity admin authorization checks in place so that password unlock alone is not sufficient to perform admin mutations; admin product mutations must still require the backend to recognize the caller as an admin.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-admin-configurable-per-product-points-field-so-an-admin-can-set-how-many-loyalty-points-are-earned-per-unit-purchased-for-each-product-and-update-the-order-placement-logic-to-award-points-based-on-the-cart-items-product-points-values-instead-of-using-total-100",
+      "title": "Add an admin-configurable per-product points field so an admin can set how many loyalty points are earned per unit purchased for each product, and update the order placement logic to award points based on the cart items’ product points values (instead of using total/100).",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-the-admin-entry-point-discoverable-in-the-ui-so-users-can-find-the-admin-login-screen-without-already-being-recognized-as-an-admin",
+      "title": "Make the Admin entry point discoverable in the UI so users can find the admin login screen without already being recognized as an admin.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-admin-page-presents-a-correct-user-understandable-gated-flow-prompt-for-internet-identity-login-when-unauthenticated-show-an-access-denied-state-when-authenticated-but-not-an-admin-and-only-show-the-admin-password-unlock-form-when-the-caller-is-authenticated-and-recognized-as-an-admin",
+      "title": "Ensure the /admin page presents a correct, user-understandable gated flow: prompt for Internet Identity login when unauthenticated; show an \"Access Denied\" state when authenticated but not an admin; and only show the admin password unlock form when the caller is authenticated and recognized as an admin.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-admin-frontend-gating-experience-so-a-user-who-is-authenticated-but-not-an-admin-sees-a-clear-explanation-and-when-eligible-can-claim-initial-admin-access-using-the-bootstrap-flow-instead-of-being-blocked-with-an-unhelpful-access-denied-screen",
+      "title": "Update the /admin frontend gating experience so a user who is authenticated but not an admin sees a clear explanation and (when eligible) can claim initial admin access using the bootstrap flow, instead of being blocked with an unhelpful \"Access Denied\" screen.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-expose-a-backend-method-to-return-the-caller-principal-as-text-and-display-it-in-the-admin-access-denied-state-so-the-user-can-share-it-for-admin-configuration-support",
+      "title": "Expose a backend method to return the caller principal (as text) and display it in the /admin Access Denied state so the user can share it for admin configuration/support.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-bootstrap-availability-check-to-be-side-effect-free-add-a-backend-query-method-to-check-whether-admin-bootstrap-is-currently-available-e-g-no-admin-configured-and-no-bootstrap-already-requested-and-update-the-frontend-to-use-this-query-instead-of-calling-requestbootstrap-inside-a-react-query-check-hook",
+      "title": "Update the bootstrap availability check to be side-effect free: add a backend query method to check whether admin bootstrap is currently available (e.g., no admin configured and no bootstrap already requested), and update the frontend to use this query instead of calling requestBootstrap inside a React Query 'check' hook.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-change-the-admin-unlock-ui-to-require-a-username-password-username-umar-zarrar-password-miang275-and-use-english-for-all-user-facing-text-in-this-flow",
+      "title": "Change the admin unlock UI to require a username + password (username: \"umar zarrar\", password: \"miang275@\"), and use English for all user-facing text in this flow.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-admin-flow-is-reachable-and-understandable-when-a-user-is-blocked-by-admin-recognition-keep-internet-identity-login-required-but-when-authenticated-and-not-an-admin-show-a-clear-english-screen-that-either-a-lets-the-user-claim-initial-admin-access-using-the-username-password-bootstrap-claim-when-bootstrap-is-available-or-b-shows-the-principal-id-with-copy-and-the-whatsapp-support-cta",
+      "title": "Ensure the /admin flow is reachable and understandable when a user is blocked by admin recognition: keep Internet Identity login required, but when authenticated and not an admin, show a clear English screen that either (A) lets the user claim initial admin access using the username+password bootstrap claim (when bootstrap is available) or (B) shows the Principal ID with copy and the WhatsApp support CTA.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-admin-unlock-flow-so-the-admin-panel-can-be-unlocked-using-only-a-single-password-miang275-and-remove-the-username-second-login-step-from-the-admin-unlock-ui",
+      "title": "Update the Admin unlock flow so the admin panel can be unlocked using only a single password (miang275@), and remove the username/second login step from the Admin unlock UI.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-session-based-admin-unlock-hook-so-it-validates-only-the-password-miang275-no-username-parameter-and-keeps-the-unlocked-state-behavior-unchanged-sessionstorage-based",
+      "title": "Update the session-based admin unlock hook so it validates only the password miang275@ (no username parameter) and keeps the unlocked state behavior unchanged (sessionStorage-based).",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-all-user-facing-text-in-the-updated-admin-unlock-flow-is-in-english-and-does-not-mention-a-username",
+      "title": "Ensure all user-facing text in the updated admin unlock flow is in English and does not mention a username.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-admin-access-flow-so-an-eligible-user-can-reach-the-admin-password-unlock-screen-instead-of-being-stuck-on-an-access-denied-screen-while-still-requiring-internet-identity-authentication-before-any-admin-access-is-granted",
+      "title": "Fix the /admin access flow so an eligible user can reach the Admin password unlock screen instead of being stuck on an 'Access Denied' screen, while still requiring Internet Identity authentication before any admin access is granted.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-frontend-bootstrap-claim-ui-and-logic-to-match-the-single-password-admin-bootstrap-requirement-remove-any-username-field-validation-and-ensure-all-user-facing-text-in-this-flow-is-english-and-does-not-mention-a-username",
+      "title": "Update the frontend bootstrap-claim UI and logic to match the single-password admin bootstrap requirement: remove any username field/validation and ensure all user-facing text in this flow is English and does not mention a username.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-improve-the-access-denied-admin-screen-to-help-diagnose-why-the-user-is-blocked-by-showing-in-english-the-caller-principal-id-with-copy-whether-bootstrap-is-currently-available-and-a-whatsapp-support-cta-to-03280941320-with-a-prefilled-message-containing-the-principal-id",
+      "title": "Improve the 'Access Denied' admin screen to help diagnose why the user is blocked by showing (in English) the caller Principal ID (with copy), whether bootstrap is currently available, and a WhatsApp support CTA to 03280941320 with a prefilled message containing the Principal ID.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -127,6 +262,42 @@
       "id": "AR-5",
       "summary": "Provide a way to add/manage products (admin product creation/editing interface) so the marketplace has items to display",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Add a password-protected admin panel (simple password screen) to allow product editing: add products, set/change price, and set product points",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Allow admin panel access using only the password (miang275@), removing/relaxing the Internet Identity + backend admin recognition gate so the admin login screen is reachable (no more 'Access Denied' blocking the password screen)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Add a backend bootstrap mechanism to allow the first admin to be established when a user sees \"Access Denied\" on /admin because no admin principals are configured yet.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Fix the backend admin bootstrap flow so that successfully completing bootstrap actually grants the bootstrap requester admin permissions (so they stop seeing \"Access Denied\" and can perform admin mutations such as createProduct/updateProduct/toggleProductActive).",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Repair backend admin bootstrap availability/admin recognition so that if no effective admin exists, bootstrap is available and successfully claiming bootstrap immediately grants the caller admin permissions that satisfy isCallerAdmin and admin-only mutations.",
+      "reqIds": [
+        "REQ-29"
+      ],
       "status": "pending"
     }
   ],

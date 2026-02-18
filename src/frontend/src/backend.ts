@@ -113,6 +113,7 @@ export interface Product {
     stock: bigint;
     category: string;
     price: bigint;
+    points: bigint;
 }
 export enum UserRole {
     admin = "admin",
@@ -123,21 +124,24 @@ export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     addToCart(productId: ProductId, quantity: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    createProduct(name: string, price: bigint, description: string, category: string, stock: bigint, imageUrls: Array<string>): Promise<ProductId>;
+    createProduct(name: string, price: bigint, description: string, category: string, stock: bigint, imageUrls: Array<string>, points: bigint): Promise<ProductId>;
     getAllProducts(): Promise<Array<Product>>;
+    getCallerPrincipal(): Promise<string>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getCart(): Promise<Array<CartItem>>;
     getPointsBalance(): Promise<bigint>;
     getProduct(productId: ProductId): Promise<Product>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    isBootstrapAvailable(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     placeOrder(): Promise<void>;
     redeemPoints(reward: RedemptionType): Promise<void>;
     removeFromCart(productId: ProductId): Promise<void>;
+    requestBootstrap(): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     toggleProductActive(productId: ProductId): Promise<void>;
-    updateProduct(productId: ProductId, name: string, price: bigint, description: string, category: string, stock: bigint, imageUrls: Array<string>, isActive: boolean): Promise<void>;
+    updateProduct(productId: ProductId, name: string, price: bigint, description: string, category: string, stock: bigint, imageUrls: Array<string>, isActive: boolean, points: bigint): Promise<void>;
 }
 import type { RedemptionType as _RedemptionType, UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -184,17 +188,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async createProduct(arg0: string, arg1: bigint, arg2: string, arg3: string, arg4: bigint, arg5: Array<string>): Promise<ProductId> {
+    async createProduct(arg0: string, arg1: bigint, arg2: string, arg3: string, arg4: bigint, arg5: Array<string>, arg6: bigint): Promise<ProductId> {
         if (this.processError) {
             try {
-                const result = await this.actor.createProduct(arg0, arg1, arg2, arg3, arg4, arg5);
+                const result = await this.actor.createProduct(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.createProduct(arg0, arg1, arg2, arg3, arg4, arg5);
+            const result = await this.actor.createProduct(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
             return result;
         }
     }
@@ -209,6 +213,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.getAllProducts();
+            return result;
+        }
+    }
+    async getCallerPrincipal(): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getCallerPrincipal();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getCallerPrincipal();
             return result;
         }
     }
@@ -296,6 +314,20 @@ export class Backend implements backendInterface {
             return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
         }
     }
+    async isBootstrapAvailable(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.isBootstrapAvailable();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.isBootstrapAvailable();
+            return result;
+        }
+    }
     async isCallerAdmin(): Promise<boolean> {
         if (this.processError) {
             try {
@@ -352,6 +384,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async requestBootstrap(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.requestBootstrap();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.requestBootstrap();
+            return result;
+        }
+    }
     async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
         if (this.processError) {
             try {
@@ -380,17 +426,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async updateProduct(arg0: ProductId, arg1: string, arg2: bigint, arg3: string, arg4: string, arg5: bigint, arg6: Array<string>, arg7: boolean): Promise<void> {
+    async updateProduct(arg0: ProductId, arg1: string, arg2: bigint, arg3: string, arg4: string, arg5: bigint, arg6: Array<string>, arg7: boolean, arg8: bigint): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateProduct(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+                const result = await this.actor.updateProduct(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateProduct(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+            const result = await this.actor.updateProduct(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
             return result;
         }
     }

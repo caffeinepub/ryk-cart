@@ -23,6 +23,7 @@ export const Product = IDL.Record({
   'stock' : IDL.Nat,
   'category' : IDL.Text,
   'price' : IDL.Nat,
+  'points' : IDL.Nat,
 });
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
 export const CartItem = IDL.Record({
@@ -39,11 +40,20 @@ export const idlService = IDL.Service({
   'addToCart' : IDL.Func([ProductId, IDL.Nat], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'createProduct' : IDL.Func(
-      [IDL.Text, IDL.Nat, IDL.Text, IDL.Text, IDL.Nat, IDL.Vec(IDL.Text)],
+      [
+        IDL.Text,
+        IDL.Nat,
+        IDL.Text,
+        IDL.Text,
+        IDL.Nat,
+        IDL.Vec(IDL.Text),
+        IDL.Nat,
+      ],
       [ProductId],
       [],
     ),
   'getAllProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
+  'getCallerPrincipal' : IDL.Func([], [IDL.Text], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getCart' : IDL.Func([], [IDL.Vec(CartItem)], ['query']),
@@ -54,10 +64,12 @@ export const idlService = IDL.Service({
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
+  'isBootstrapAvailable' : IDL.Func([], [IDL.Bool], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'placeOrder' : IDL.Func([], [], []),
   'redeemPoints' : IDL.Func([RedemptionType], [], []),
   'removeFromCart' : IDL.Func([ProductId], [], []),
+  'requestBootstrap' : IDL.Func([], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'toggleProductActive' : IDL.Func([ProductId], [], []),
   'updateProduct' : IDL.Func(
@@ -70,6 +82,7 @@ export const idlService = IDL.Service({
         IDL.Nat,
         IDL.Vec(IDL.Text),
         IDL.Bool,
+        IDL.Nat,
       ],
       [],
       [],
@@ -94,6 +107,7 @@ export const idlFactory = ({ IDL }) => {
     'stock' : IDL.Nat,
     'category' : IDL.Text,
     'price' : IDL.Nat,
+    'points' : IDL.Nat,
   });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
   const CartItem = IDL.Record({
@@ -110,11 +124,20 @@ export const idlFactory = ({ IDL }) => {
     'addToCart' : IDL.Func([ProductId, IDL.Nat], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'createProduct' : IDL.Func(
-        [IDL.Text, IDL.Nat, IDL.Text, IDL.Text, IDL.Nat, IDL.Vec(IDL.Text)],
+        [
+          IDL.Text,
+          IDL.Nat,
+          IDL.Text,
+          IDL.Text,
+          IDL.Nat,
+          IDL.Vec(IDL.Text),
+          IDL.Nat,
+        ],
         [ProductId],
         [],
       ),
     'getAllProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
+    'getCallerPrincipal' : IDL.Func([], [IDL.Text], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getCart' : IDL.Func([], [IDL.Vec(CartItem)], ['query']),
@@ -125,10 +148,12 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
+    'isBootstrapAvailable' : IDL.Func([], [IDL.Bool], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'placeOrder' : IDL.Func([], [], []),
     'redeemPoints' : IDL.Func([RedemptionType], [], []),
     'removeFromCart' : IDL.Func([ProductId], [], []),
+    'requestBootstrap' : IDL.Func([], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'toggleProductActive' : IDL.Func([ProductId], [], []),
     'updateProduct' : IDL.Func(
@@ -141,6 +166,7 @@ export const idlFactory = ({ IDL }) => {
           IDL.Nat,
           IDL.Vec(IDL.Text),
           IDL.Bool,
+          IDL.Nat,
         ],
         [],
         [],

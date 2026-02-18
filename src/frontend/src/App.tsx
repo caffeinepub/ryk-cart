@@ -7,7 +7,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import OrderConfirmationPage from './pages/OrderConfirmationPage';
 import OrderHistoryPage from './pages/OrderHistoryPage';
 import RewardsPage from './pages/RewardsPage';
-import AdminProductsPage from './pages/AdminProductsPage';
+import AdminPage from './pages/AdminPage';
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -62,7 +62,7 @@ const rewardsRoute = createRoute({
 const adminRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/admin',
-  component: AdminProductsPage,
+  component: AdminPage,
 });
 
 const routeTree = rootRoute.addChildren([

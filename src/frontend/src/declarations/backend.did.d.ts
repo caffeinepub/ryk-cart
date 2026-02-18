@@ -20,6 +20,7 @@ export interface Product {
   'stock' : bigint,
   'category' : string,
   'price' : bigint,
+  'points' : bigint,
 }
 export type ProductId = bigint;
 export type RedemptionType = { 'mysteryBox' : string } |
@@ -33,24 +34,37 @@ export interface _SERVICE {
   'addToCart' : ActorMethod<[ProductId, bigint], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'createProduct' : ActorMethod<
-    [string, bigint, string, string, bigint, Array<string>],
+    [string, bigint, string, string, bigint, Array<string>, bigint],
     ProductId
   >,
   'getAllProducts' : ActorMethod<[], Array<Product>>,
+  'getCallerPrincipal' : ActorMethod<[], string>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getCart' : ActorMethod<[], Array<CartItem>>,
   'getPointsBalance' : ActorMethod<[], bigint>,
   'getProduct' : ActorMethod<[ProductId], Product>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'isBootstrapAvailable' : ActorMethod<[], boolean>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'placeOrder' : ActorMethod<[], undefined>,
   'redeemPoints' : ActorMethod<[RedemptionType], undefined>,
   'removeFromCart' : ActorMethod<[ProductId], undefined>,
+  'requestBootstrap' : ActorMethod<[], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'toggleProductActive' : ActorMethod<[ProductId], undefined>,
   'updateProduct' : ActorMethod<
-    [ProductId, string, bigint, string, string, bigint, Array<string>, boolean],
+    [
+      ProductId,
+      string,
+      bigint,
+      string,
+      string,
+      bigint,
+      Array<string>,
+      boolean,
+      bigint,
+    ],
     undefined
   >,
 }

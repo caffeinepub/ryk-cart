@@ -8,9 +8,12 @@ import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import Text "mo:core/Text";
 import Time "mo:core/Time";
-import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import MixinAuthorization "authorization/MixinAuthorization";
+import Int "mo:core/Int";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   type ProductId = Nat;
 
@@ -23,6 +26,7 @@ actor {
     stock : Nat;
     imageUrls : [Text];
     isActive : Bool;
+    points : Nat;
   };
 
   module Product {
@@ -84,6 +88,8 @@ actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
+  var bootstrapClaimed = false;
+
   let products = Map.empty<ProductId, Product>();
   let carts = Map.empty<Principal, Set.Set<CartItem>>();
   let orders = Map.empty<OrderId, Order>();
@@ -94,6 +100,27 @@ actor {
   var nextProductId = 1;
   var nextOrderId = 1;
   var nextRedemptionId = 1;
+
+  // Bootstrap mechanism: Any user can request bootstrap when no admin exists.
+  public shared ({ caller }) func requestBootstrap() : async () {
+    if (bootstrapClaimed) {
+      Runtime.trap("Bootstrap already claimed");
+    };
+
+    bootstrapClaimed := true;
+
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Bootstrap failed: Admin permissions not granted");
+    };
+  };
+
+  public query ({ caller }) func isBootstrapAvailable() : async Bool {
+    not bootstrapClaimed;
+  };
+
+  public query ({ caller }) func getCallerPrincipal() : async Text {
+    caller.toText();
+  };
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
@@ -116,7 +143,15 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  public shared ({ caller }) func createProduct(name : Text, price : Nat, description : Text, category : Text, stock : Nat, imageUrls : [Text]) : async ProductId {
+  public shared ({ caller }) func createProduct(
+    name : Text,
+    price : Nat,
+    description : Text,
+    category : Text,
+    stock : Nat,
+    imageUrls : [Text],
+    points : Nat,
+  ) : async ProductId {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can create products");
     };
@@ -130,6 +165,7 @@ actor {
       stock;
       imageUrls;
       isActive = true;
+      points;
     };
 
     products.add(nextProductId, product);
@@ -138,7 +174,7 @@ actor {
     currentId;
   };
 
-  public shared ({ caller }) func updateProduct(productId : ProductId, name : Text, price : Nat, description : Text, category : Text, stock : Nat, imageUrls : [Text], isActive : Bool) : async () {
+  public shared ({ caller }) func updateProduct(productId : ProductId, name : Text, price : Nat, description : Text, category : Text, stock : Nat, imageUrls : [Text], isActive : Bool, points : Nat) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can update products");
     };
@@ -152,6 +188,7 @@ actor {
       stock;
       imageUrls;
       isActive;
+      points;
     };
 
     products.add(productId, product);
@@ -176,6 +213,7 @@ actor {
       stock = product.stock;
       imageUrls = product.imageUrls;
       isActive = not product.isActive;
+      points = product.points;
     };
 
     products.add(productId, updatedProduct);
@@ -288,7 +326,18 @@ actor {
       case (?points) { points };
     };
 
-    loyaltyPoints.add(caller, currentPoints + total / 100);
+    let pointsEarned = cart.values().toArray().foldLeft(
+      0,
+      func(acc, item) {
+        let productPoints = switch (products.get(item.productId)) {
+          case (null) { 0 };
+          case (?product) { product.points };
+        };
+        acc + productPoints * item.quantity;
+      },
+    );
+
+    loyaltyPoints.add(caller, currentPoints + pointsEarned);
     carts.remove(caller);
     nextOrderId += 1;
   };
@@ -309,27 +358,28 @@ actor {
       Runtime.trap("Unauthorized: Only users can redeem points");
     };
 
+    let pointsRequired : Nat = switch (reward) {
+      case (#cashback(_)) { 20 };
+      case (#mysteryBox(_)) { 20 };
+    };
+
     let points = switch (loyaltyPoints.get(caller)) {
       case (null) { 0 };
       case (?p) { p };
     };
 
-    if (points < 20) { Runtime.trap("Not enough points for redemption") };
+    if (points < pointsRequired) { Runtime.trap("Not enough points for redemption") };
 
     let redemption : Redemption = {
       id = nextRedemptionId;
       user = caller;
-      points = 20;
+      points = pointsRequired;
       reward;
       timestamp = Time.now();
     };
 
-    if (points >= 20) {
-      loyaltyPoints.add(caller, points - 20);
-    } else {
-      Runtime.trap("Not enough points for redemption");
-    };
-    redemptions.add(nextRedemptionId, redemption);
+    loyaltyPoints.add(caller, points - pointsRequired : Nat);
+    redemptions.add(Int.abs(nextRedemptionId), redemption);
     nextRedemptionId += 1;
   };
 };

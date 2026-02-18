@@ -1,55 +1,68 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Admin-friendly empty states for catalog and product management",
+  "title": "Repair /admin gating, bootstrap claim UX, and Access Denied diagnostics",
   "requirements": [
     {
-      "id": "REQ-9",
-      "summary": "Add a guided empty-state on the Catalog (Shop) page when there are zero active products, with admin-aware call-to-action to go to Product Management.",
+      "id": "REQ-27",
+      "summary": "Fix /admin routing and gating so signed-out users see an Internet Identity login prompt, signed-in admins reach the admin password unlock screen, and non-admins get a clear next step without blocking eligible admins.",
       "acceptanceCriteria": [
-        "When there are no active products, the Catalog page shows an empty-state panel instead of only the generic 'No products found' text.",
-        "The empty state includes English guidance that products must be added from the Admin area (e.g., “If you are an admin, go to Admin → Product Management to add products.”).",
-        "If the current user is an admin (based on the existing isAdmin query), the empty state includes a visible button that navigates to /admin.",
-        "If the current user is not an admin, the empty state does not show an Admin navigation button and instead shows a short note indicating the admin area is restricted."
+        "When visiting /admin while signed out, the page shows an Internet Identity login prompt (no admin password form is shown yet).",
+        "When visiting /admin while signed in and recognized as an admin by the backend, the admin password unlock form is shown, and after entering the correct password (miang275@) the Admin Products panel is displayed.",
+        "When visiting /admin while signed in but not recognized as an admin, the page shows a clear English explanation and a path to proceed (bootstrap claim if available, otherwise principal + WhatsApp support)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/CatalogPage.tsx",
+          "path": "frontend/src/components/auth/AdminGate.tsx",
           "operation": "modify",
-          "description": "Use the existing isAdmin query (via useIsAdmin from frontend/src/hooks/useQueries.ts) to render a dedicated empty-state panel when activeProducts.length === 0. Show English guidance to add products via Admin → Product Management; if isAdmin is true, show a Button that navigates to /admin; if isAdmin is false, omit the button and show a short note that the admin area is restricted. Keep the existing 'No products found' behavior for cases where products exist but filters/search return no matches. Verify the component's usage instructions before implementing."
+          "description": "Repair admin gating decision tree to (1) always require Internet Identity authentication before any admin UI, (2) only show Access Denied for authenticated non-admins, and (3) present a clear path forward (bootstrap claim when available; otherwise WhatsApp support + principal). Use the authorization component’s frontend guidance for authenticated-vs-guest gating behavior; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/AdminPage.tsx",
+          "operation": "modify",
+          "description": "Ensure the admin password unlock UI is only reachable once AdminGate confirms backend-recognized admin status, and keep the rule that password unlock is UI-only (does not grant backend admin privileges). Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-10",
-      "summary": "Add an always-available 'How to add products' help entry point for admins on the Admin Products page explaining minimal product creation steps and where Product Management lives.",
+      "id": "REQ-28",
+      "summary": "Update bootstrap-claim UI and logic to single-password bootstrap (no username) with all-English text and automatic admin-status recheck after success.",
       "acceptanceCriteria": [
-        "Admins can access a short help UI (e.g., a link/button in the Admin Products page header or a compact callout) that explains, in English, how to add products.",
-        "The help content explicitly mentions that the Admin page is at /admin and the primary action is the existing “Add Product” button.",
-        "The help content mentions that image URLs are entered one per line and are optional.",
-        "No changes are required to Internet Identity hooks or immutable paths to deliver this help UI."
+        "The 'Claim admin access' section (when bootstrap is available) only asks for a password (miang275@).",
+        "No UI labels, placeholders, alerts, or error messages mention a username anywhere in the admin gating/bootstrap claim flow.",
+        "Submitting the correct password triggers the backend bootstrap request and then re-checks admin status automatically (React Query invalidations), allowing the user to proceed without manually refreshing."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/AdminProductsPage.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Add a compact, always-visible help entry point for admins in the page header (e.g., a small Button that opens a Dialog). The help content must be in English and briefly list the minimum steps (name, price, category, stock, optional image URLs) and explicitly state that Product Management is at /admin and that the primary action is the existing “Add Product” button. Explicitly mention image URLs are optional and entered one per line. Do not modify Internet Identity hooks. Verify the component's usage instructions before implementing."
+          "description": "Change the bootstrap-claim mutation to accept only a password, remove any username validation and any user-facing username-related error text, and keep React Query invalidations that force a fresh isAdmin + bootstrap availability re-check after success. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/auth/AdminGate.tsx",
+          "operation": "modify",
+          "description": "Update the bootstrap claim form to remove the username field entirely, update all copy to English without mentioning username, and wire submission to the updated single-password bootstrap claim mutation. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-11",
-      "summary": "Improve Admin Products table loading and empty states so admins can distinguish loading vs no products, without breaking existing table actions.",
+      "id": "REQ-30",
+      "summary": "Improve the Access Denied admin screen with principal copy, bootstrap availability status, and a WhatsApp support CTA with a prefilled message containing the principal.",
       "acceptanceCriteria": [
-        "While loading, the Admin Products page shows a clear loading indicator in the table area.",
-        "When loading is complete and there are no products, the Admin Products page shows an explicit empty state (in English) such as “No products yet. Click ‘Add Product’ to create your first product.”",
-        "When products exist, the current table rendering remains functional (edit and activate/deactivate actions still work)."
+        "The Access Denied screen shows the caller Principal ID in a copyable, monospace field.",
+        "The Access Denied screen displays the current bootstrap availability state (e.g., 'Bootstrap available: Yes/No') in a user-understandable way.",
+        "A WhatsApp support button is present and opens WhatsApp chat to phone number 03280941320 with a prefilled message that includes the Principal ID."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/AdminProductsPage.tsx",
+          "path": "frontend/src/components/auth/AdminGate.tsx",
           "operation": "modify",
-          "description": "Update the CardContent/table rendering to (1) show a clear loading indicator within the table area while isLoading is true (e.g., a spinner row or table-area skeleton), and (2) after loading, if products is empty, show an explicit English empty-state message (e.g., “No products yet. Click ‘Add Product’ to create your first product.”) in the table area. Preserve the existing table and row actions when products exist. Verify the component's usage instructions before implementing."
+          "description": "Enhance the Access Denied view to always show (in English) the caller Principal ID with copy action, show a clear 'Bootstrap available: Yes/No' status (with loading state handling), and include a WhatsApp support CTA whose prefilled message includes the principal. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/SupportWhatsAppLink.tsx",
+          "operation": "modify",
+          "description": "Extend the WhatsApp support component to better support the admin Access Denied CTA (e.g., allow a custom button label like 'WhatsApp Support' while keeping existing defaults), ensuring it continues to target 03280941320 and supports passing a prefilled message containing the Principal ID. Verify the component's usage instructions before implementing."
         }
       ]
     }

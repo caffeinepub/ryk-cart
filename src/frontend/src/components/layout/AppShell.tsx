@@ -8,7 +8,6 @@ import AccountSummary from './AccountSummary';
 import SupportWhatsAppLink from '../SupportWhatsAppLink';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
 import { useGetCallerUserProfile } from '../../hooks/useQueries';
-import { useIsAdmin } from '../../hooks/useQueries';
 
 interface AppShellProps {
   children: ReactNode;
@@ -18,7 +17,6 @@ export default function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate();
   const { identity } = useInternetIdentity();
   const isAuthenticated = !!identity;
-  const { data: isAdmin } = useIsAdmin();
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -52,12 +50,10 @@ export default function AppShell({ children }: AppShellProps) {
                   </Link>
                 </>
               )}
-              {isAdmin && (
-                <Link to="/admin" className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-1">
-                  <Shield className="h-4 w-4" />
-                  Admin
-                </Link>
-              )}
+              <Link to="/admin" className="text-sm font-medium transition-colors hover:text-primary flex items-center gap-1">
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
             </nav>
           </div>
 
@@ -106,6 +102,7 @@ export default function AppShell({ children }: AppShellProps) {
                     <li><Link to="/rewards" className="text-muted-foreground hover:text-foreground">Rewards</Link></li>
                   </>
                 )}
+                <li><Link to="/admin" className="text-muted-foreground hover:text-foreground">Admin</Link></li>
               </ul>
             </div>
             

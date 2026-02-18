@@ -1,21 +1,38 @@
 import { MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default function SupportWhatsAppLink() {
+interface SupportWhatsAppLinkProps {
+  message?: string;
+  variant?: 'ghost' | 'default' | 'outline' | 'secondary' | 'destructive' | 'link';
+  size?: 'sm' | 'default' | 'lg' | 'icon';
+  className?: string;
+  showIcon?: boolean;
+  label?: string;
+}
+
+export default function SupportWhatsAppLink({ 
+  message, 
+  variant = 'ghost', 
+  size = 'sm',
+  className = 'gap-2',
+  showIcon = true,
+  label = 'Contact Support'
+}: SupportWhatsAppLinkProps) {
   const phoneNumber = '923280941320';
-  const message = encodeURIComponent('Hello Ryk cart support, I need help with my order.');
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+  const defaultMessage = 'Hello Ryk cart support, I need help with my order.';
+  const finalMessage = encodeURIComponent(message || defaultMessage);
+  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${finalMessage}`;
 
   return (
     <Button
-      variant="ghost"
-      size="sm"
+      variant={variant}
+      size={size}
       asChild
-      className="gap-2"
+      className={className}
     >
       <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-        <MessageCircle className="h-4 w-4" />
-        <span className="hidden md:inline">Support</span>
+        {showIcon && <MessageCircle className="h-4 w-4" />}
+        {label}
       </a>
     </Button>
   );

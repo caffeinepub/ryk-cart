@@ -1,58 +1,76 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T03:39:18.311Z",
+  "generatedAt": "2026-02-18T05:14:54.854Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
+    "total": 4,
     "implemented": 3,
     "items": [
       {
-        "id": "REQ-10",
-        "summary": "Add a small, always-available 'How to add products' help entry point for admins that explains the minimum steps to create a product (name, price, category, stock, optional image URLs) and where to find Product Management.",
+        "id": "REQ-27",
+        "summary": "Fix the /admin access flow so an eligible user can reach the Admin password unlock screen instead of being stuck on an 'Access Denied' screen, while still requiring Internet Identity authentication before any admin access is granted.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/AdminProductsPage.tsx"
+          "frontend/src/components/auth/AdminGate.tsx",
+          "frontend/src/pages/AdminPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/AdminProductsPage.tsx"
+          "frontend/src/components/auth/AdminGate.tsx"
         ]
       },
       {
-        "id": "REQ-11",
-        "summary": "Improve the Admin Products page table empty/loading states so an admin can immediately tell whether products are missing vs. still loading.",
+        "id": "REQ-28",
+        "summary": "Update the frontend bootstrap-claim UI and logic to match the single-password admin bootstrap requirement: remove any username field/validation and ensure all user-facing text in this flow is English and does not mention a username.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/AdminProductsPage.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/auth/AdminGate.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/AdminProductsPage.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/auth/AdminGate.tsx"
         ]
       },
       {
-        "id": "REQ-9",
-        "summary": "Add a clear empty-state experience on the Catalog (Shop) page when there are zero active products, explaining that no products are available yet and guiding an admin to add products via the Admin → Product Management page.",
+        "id": "REQ-29",
+        "summary": "Repair backend admin bootstrap availability/admin recognition so that if no effective admin exists, bootstrap is available and successfully claiming bootstrap immediately grants the caller admin permissions that satisfy isCallerAdmin and admin-only mutations.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-30",
+        "summary": "Improve the 'Access Denied' admin screen to help diagnose why the user is blocked by showing (in English) the caller Principal ID (with copy), whether bootstrap is currently available, and a WhatsApp support CTA to 03280941320 with a prefilled message containing the Principal ID.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/CatalogPage.tsx"
+          "frontend/src/components/auth/AdminGate.tsx",
+          "frontend/src/components/SupportWhatsAppLink.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/CatalogPage.tsx"
+          "frontend/src/components/auth/AdminGate.tsx",
+          "frontend/src/components/SupportWhatsAppLink.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
-    "build-template/README.md",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/pages/AdminProductsPage.tsx",
-    "frontend/src/pages/CatalogPage.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/SupportWhatsAppLink.tsx",
+    "frontend/src/components/auth/AdminGate.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -1,74 +1,93 @@
 {
   "kind": "build_request",
-  "title": "Make it easy for admins to add products when the catalog is empty",
+  "title": "Fix /admin 'Access Denied' by repairing admin gating and bootstrap claim flow",
   "projectName": "Ryk cart",
-  "priority": "normal",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-9",
-      "text": "Add a clear empty-state experience on the Catalog (Shop) page when there are zero active products, explaining that no products are available yet and guiding an admin to add products via the Admin → Product Management page.",
+      "id": "REQ-27",
+      "text": "Fix the /admin access flow so an eligible user can reach the Admin password unlock screen instead of being stuck on an 'Access Denied' screen, while still requiring Internet Identity authentication before any admin access is granted.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-1"
         ],
         "quotes": [
-          "is my product nhi hyn wo kaisay add kron"
+          "access denied hi arha hy"
         ]
       },
       "acceptanceCriteria": [
-        "When there are no active products, the Catalog page shows an empty-state panel instead of only the generic 'No products found' text.",
-        "The empty state includes English guidance that products must be added from the Admin area (e.g., “If you are an admin, go to Admin → Product Management to add products.”).",
-        "If the current user is an admin (based on the existing isAdmin query), the empty state includes a visible button that navigates to /admin.",
-        "If the current user is not an admin, the empty state does not show an Admin navigation button and instead shows a short note indicating the admin area is restricted."
+        "When visiting /admin while signed out, the page shows an Internet Identity login prompt (no admin password form is shown yet).",
+        "When visiting /admin while signed in and recognized as an admin by the backend, the admin password unlock form is shown, and after entering the correct password (miang275@) the Admin Products panel is displayed.",
+        "When visiting /admin while signed in but not recognized as an admin, the page shows a clear English explanation and a path to proceed (bootstrap claim if available, otherwise principal + WhatsApp support)."
       ]
     },
     {
-      "id": "REQ-10",
-      "text": "Add a small, always-available 'How to add products' help entry point for admins that explains the minimum steps to create a product (name, price, category, stock, optional image URLs) and where to find Product Management.",
+      "id": "REQ-28",
+      "text": "Update the frontend bootstrap-claim UI and logic to match the single-password admin bootstrap requirement: remove any username field/validation and ensure all user-facing text in this flow is English and does not mention a username.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-1"
         ],
         "quotes": [
-          "is my product nhi hyn wo kaisay add kron"
+          "access denied hi arha hy"
         ]
       },
       "acceptanceCriteria": [
-        "Admins can access a short help UI (e.g., a link/button in the Admin Products page header or a compact callout) that explains, in English, how to add products.",
-        "The help content explicitly mentions that the Admin page is at /admin and the primary action is the existing “Add Product” button.",
-        "The help content mentions that image URLs are entered one per line and are optional.",
-        "No changes are required to Internet Identity hooks or immutable paths to deliver this help UI."
+        "The 'Claim admin access' section (when bootstrap is available) only asks for a password (miang275@).",
+        "No UI labels, placeholders, alerts, or error messages mention a username anywhere in the admin gating/bootstrap claim flow.",
+        "Submitting the correct password triggers the backend bootstrap request and then re-checks admin status automatically (React Query invalidations), allowing the user to proceed without manually refreshing."
       ]
     },
     {
-      "id": "REQ-11",
-      "text": "Improve the Admin Products page table empty/loading states so an admin can immediately tell whether products are missing vs. still loading.",
-      "target": "frontend",
+      "id": "REQ-29",
+      "text": "Repair backend admin bootstrap availability/admin recognition so that if no effective admin exists, bootstrap is available and successfully claiming bootstrap immediately grants the caller admin permissions that satisfy isCallerAdmin and admin-only mutations.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-1"
         ],
         "quotes": [
-          "is my product nhi hyn wo kaisay add kron"
+          "access denied hi arha hy"
         ]
       },
       "acceptanceCriteria": [
-        "While loading, the Admin Products page shows a clear loading indicator in the table area.",
-        "When loading is complete and there are no products, the Admin Products page shows an explicit empty state (in English) such as “No products yet. Click ‘Add Product’ to create your first product.”",
-        "When products exist, the current table rendering remains functional (edit and activate/deactivate actions still work)."
+        "If the system has no effective admin configured, the backend bootstrap availability query returns true for an authenticated caller.",
+        "After calling requestBootstrap successfully, subsequent calls to isCallerAdmin for the same caller return true.",
+        "After successful bootstrap, the caller can perform admin-only mutations (createProduct/updateProduct/toggleProductActive) without receiving 'Unauthorized' traps.",
+        "The bootstrap availability logic does not incorrectly return false due only to stale/incorrect adminInitialized state."
+      ]
+    },
+    {
+      "id": "REQ-30",
+      "text": "Improve the 'Access Denied' admin screen to help diagnose why the user is blocked by showing (in English) the caller Principal ID (with copy), whether bootstrap is currently available, and a WhatsApp support CTA to 03280941320 with a prefilled message containing the Principal ID.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "access denied hi arha hy"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The Access Denied screen shows the caller Principal ID in a copyable, monospace field.",
+        "The Access Denied screen displays the current bootstrap availability state (e.g., 'Bootstrap available: Yes/No') in a user-understandable way.",
+        "A WhatsApp support button is present and opens WhatsApp chat to phone number 03280941320 with a prefilled message that includes the Principal ID."
       ]
     }
   ],
   "constraints": [
-    "Frontend must not modify files under frontend/src/components/ui (shadcn components) and must not edit the immutable paths listed in SYSTEM_CONTEXT.",
-    "Do not introduce any external services for product storage or image hosting; product images must continue to use user-provided URLs as currently supported."
+    "Backend must remain a single Motoko actor in backend/main.mo; add backend/migration.mo only if a state upgrade is required.",
+    "Do not edit any frontend files under the immutablePaths list in SYSTEM_CONTEXT.",
+    "Use English for all user-facing text changed or added as part of this build request.",
+    "Keep the existing rule that admin product mutations must still require backend-recognized admin privileges (password unlock alone must not grant backend admin permissions)."
   ],
   "nonGoals": [
-    "Changing the backend product schema or admin authorization rules.",
-    "Adding a new authentication provider (Internet Identity remains the only auth).",
-    "Auto-generating or seeding products without an explicit user/admin action."
+    "Adding new authentication providers beyond Internet Identity.",
+    "Implementing real-time features (WebSockets/chat).",
+    "Changing the admin password value (must remain miang275@)."
   ],
   "imageRequirements": {
     "required": [],

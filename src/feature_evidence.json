@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-clear-empty-state-experience-on-the-catalog-shop-page-when-there-are-zero-active-products-explaining-that-no-products-are-available-yet-and-guiding-an-admin-to-add-products-via-the-admin-product-management-page",
-      "featureTitle": "Add a clear empty-state experience on the Catalog (Shop) page when there are zero active products, explaining that no products are available yet and guiding an admin to add products via the Admin → Product Management page.",
+      "featureId": "feature-fix-the-admin-access-flow-so-an-eligible-user-can-reach-the-admin-password-unlock-screen-instead-of-being-stuck-on-an-access-denied-screen-while-still-requiring-internet-identity-authentication-before-any-admin-access-is-granted",
+      "featureTitle": "Fix the /admin access flow so an eligible user can reach the Admin password unlock screen instead of being stuck on an 'Access Denied' screen, while still requiring Internet Identity authentication before any admin access is granted.",
       "files": [
-        "frontend/src/pages/CatalogPage.tsx"
+        "frontend/src/components/auth/AdminGate.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -16,15 +16,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-9"
+        "REQ-27"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-small-always-available-how-to-add-products-help-entry-point-for-admins-that-explains-the-minimum-steps-to-create-a-product-name-price-category-stock-optional-image-urls-and-where-to-find-product-management",
-      "featureTitle": "Add a small, always-available 'How to add products' help entry point for admins that explains the minimum steps to create a product (name, price, category, stock, optional image URLs) and where to find Product Management.",
+      "featureId": "feature-update-the-frontend-bootstrap-claim-ui-and-logic-to-match-the-single-password-admin-bootstrap-requirement-remove-any-username-field-validation-and-ensure-all-user-facing-text-in-this-flow-is-english-and-does-not-mention-a-username",
+      "featureTitle": "Update the frontend bootstrap-claim UI and logic to match the single-password admin bootstrap requirement: remove any username field/validation and ensure all user-facing text in this flow is English and does not mention a username.",
       "files": [
-        "frontend/src/pages/AdminProductsPage.tsx"
+        "frontend/src/components/auth/AdminGate.tsx",
+        "frontend/src/hooks/useQueries.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -35,15 +36,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-10"
+        "REQ-28"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-improve-the-admin-products-page-table-empty-loading-states-so-an-admin-can-immediately-tell-whether-products-are-missing-vs-still-loading",
-      "featureTitle": "Improve the Admin Products page table empty/loading states so an admin can immediately tell whether products are missing vs. still loading.",
+      "featureId": "feature-improve-the-access-denied-admin-screen-to-help-diagnose-why-the-user-is-blocked-by-showing-in-english-the-caller-principal-id-with-copy-whether-bootstrap-is-currently-available-and-a-whatsapp-support-cta-to-03280941320-with-a-prefilled-message-containing-the-principal-id",
+      "featureTitle": "Improve the 'Access Denied' admin screen to help diagnose why the user is blocked by showing (in English) the caller Principal ID (with copy), whether bootstrap is currently available, and a WhatsApp support CTA to 03280941320 with a prefilled message containing the Principal ID.",
       "files": [
-        "frontend/src/pages/AdminProductsPage.tsx"
+        "frontend/src/components/SupportWhatsAppLink.tsx",
+        "frontend/src/components/auth/AdminGate.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -54,7 +56,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-11"
+        "REQ-30"
       ],
       "confidence": "high"
     }

@@ -1,17 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Make it clear how to add products when the shop catalog is empty, and improve admin product list guidance for loading vs empty states.
+**Goal:** Fix the /admin access flow so eligible users can reach the admin unlock screen, support single-password bootstrap claiming when needed, and provide clearer diagnostics when access is denied.
 
 **Planned changes:**
-- Add a dedicated empty-state panel on the Catalog (Shop) page when there are zero active products, explaining that products are not available yet and directing admins to Admin → Product Management.
-- Use the existing `isAdmin` query to tailor the Catalog empty state:
-  - Admins: show a button that navigates to `/admin`.
-  - Non-admins: hide the admin button and show a short note that the admin area is restricted.
-- Add an always-available “How to add products” help entry point for admins (in the Admin Products area) describing the minimum required fields (name, price, category, stock) plus optional image URLs (one per line), and where to find Product Management (`/admin`) and the existing “Add Product” button.
-- Improve the Admin Products page table loading/empty states:
-  - Show a clear loading indicator while product data is loading.
-  - After loading, if there are no products, show an explicit empty state message guiding the admin to click “Add Product”.
-  - Keep current table behavior unchanged when products exist (including edit and activate/deactivate actions).
+- Update frontend /admin gating to: prompt Internet Identity login when signed out; show admin password unlock when signed in and backend-recognized as admin; otherwise show an improved Access Denied screen with next steps.
+- Update the frontend bootstrap-claim flow to require only a single password (no username anywhere), use English-only text, and auto re-check admin status after a successful claim (React Query invalidations) so the user can proceed without refreshing.
+- Repair backend bootstrap availability and admin recognition so that when no effective admin exists bootstrap becomes available, claiming bootstrap grants the caller admin privileges for isCallerAdmin and admin-only mutations, and availability is not blocked by stale/incorrect admin initialization state.
+- Enhance the Access Denied UI to display the caller Principal ID (copyable/monospace), show whether bootstrap is available (Yes/No), and include a WhatsApp support CTA to 03280941320 with a prefilled message containing the Principal ID.
 
-**User-visible outcome:** When the shop has no products, users see a clear explanation instead of a generic message; admins get a direct path and quick help to add products, and the Admin Products list clearly distinguishes loading from having no products.
+**User-visible outcome:** Visiting /admin now guides the user correctly: signed-out users are asked to sign in with Internet Identity; signed-in admins can unlock and access the Admin Products panel; signed-in non-admins see clear English guidance, bootstrap claim (if available), and a support button that shares their Principal ID via WhatsApp.

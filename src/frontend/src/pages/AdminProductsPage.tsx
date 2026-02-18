@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useGetAllProducts, useCreateProduct, useUpdateProduct, useToggleProductActive } from '../hooks/useProducts';
+import { useAdminUnlock } from '../hooks/useAdminUnlock';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -10,7 +11,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Edit, Power, Loader2, HelpCircle, PackageOpen } from 'lucide-react';
+import { Plus, Edit, Power, Loader2, HelpCircle, PackageOpen, Lock } from 'lucide-react';
 import AdminGate from '../components/auth/AdminGate';
 import { toast } from 'sonner';
 import type { Product } from '../backend';
@@ -22,6 +23,7 @@ interface ProductFormData {
   category: string;
   stock: string;
   imageUrls: string;
+  points: string;
 }
 
 export default function AdminProductsPage() {
@@ -29,6 +31,7 @@ export default function AdminProductsPage() {
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const toggleActive = useToggleProductActive();
+  const { lock } = useAdminUnlock();
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
@@ -40,6 +43,7 @@ export default function AdminProductsPage() {
     category: '',
     stock: '',
     imageUrls: '',
+    points: '0',
   });
 
   const resetForm = () => {
@@ -50,6 +54,7 @@ export default function AdminProductsPage() {
       category: '',
       stock: '',
       imageUrls: '',
+      points: '0',
     });
     setEditingProduct(null);
   };
@@ -63,6 +68,7 @@ export default function AdminProductsPage() {
       category: product.category,
       stock: product.stock.toString(),
       imageUrls: product.imageUrls.join('\n'),
+      points: product.points?.toString() || '0',
     });
     setIsDialogOpen(true);
   };
@@ -70,6 +76,7 @@ export default function AdminProductsPage() {
   const handleSubmit = async () => {
     try {
       const imageUrlsArray = formData.imageUrls.split('\n').map(url => url.trim()).filter(url => url);
+      const pointsValue = BigInt(formData.points || '0');
       
       if (editingProduct) {
         await updateProduct.mutateAsync({
@@ -81,6 +88,7 @@ export default function AdminProductsPage() {
           stock: BigInt(formData.stock),
           imageUrls: imageUrlsArray,
           isActive: editingProduct.isActive,
+          points: pointsValue,
         });
         toast.success('Product updated successfully');
       } else {
@@ -91,6 +99,7 @@ export default function AdminProductsPage() {
           category: formData.category,
           stock: BigInt(formData.stock),
           imageUrls: imageUrlsArray,
+          points: pointsValue,
         });
         toast.success('Product created successfully');
       }
@@ -98,7 +107,12 @@ export default function AdminProductsPage() {
       setIsDialogOpen(false);
       resetForm();
     } catch (error: any) {
-      toast.error(error.message || 'Failed to save product');
+      const errorMessage = error.message || 'Failed to save product';
+      if (errorMessage.includes('Unauthorized') || errorMessage.includes('admin')) {
+        toast.error('Authorization failed. You do not have admin permissions.');
+      } else {
+        toast.error(errorMessage);
+      }
     }
   };
 
@@ -107,8 +121,18 @@ export default function AdminProductsPage() {
       await toggleActive.mutateAsync(productId);
       toast.success('Product status updated');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update product status');
+      const errorMessage = error.message || 'Failed to update product status';
+      if (errorMessage.includes('Unauthorized') || errorMessage.includes('admin')) {
+        toast.error('Authorization failed. You do not have admin permissions.');
+      } else {
+        toast.error(errorMessage);
+      }
     }
+  };
+
+  const handleLockAdmin = () => {
+    lock();
+    toast.success('Admin panel locked');
   };
 
   return (
@@ -117,6 +141,10 @@ export default function AdminProductsPage() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-4xl font-bold">Product Management</h1>
           <div className="flex gap-2">
+            <Button variant="outline" size="icon" onClick={handleLockAdmin} title="Lock admin panel">
+              <Lock className="h-4 w-4" />
+            </Button>
+            
             <Dialog open={isHelpOpen} onOpenChange={setIsHelpOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="icon">
@@ -141,7 +169,7 @@ export default function AdminProductsPage() {
                   </Alert>
                   
                   <div className="space-y-3">
-                    <h4 className="font-semibold text-sm">Minimum Required Fields:</h4>
+                    <h4 className="font-semibold text-sm">Required Fields:</h4>
                     <ul className="space-y-2 text-sm text-muted-foreground">
                       <li className="flex items-start gap-2">
                         <span className="font-medium text-foreground min-w-24">Name:</span>
@@ -164,6 +192,10 @@ export default function AdminProductsPage() {
                         <span>Brief product description</span>
                       </li>
                       <li className="flex items-start gap-2">
+                        <span className="font-medium text-foreground min-w-24">Points:</span>
+                        <span>Loyalty points earned per unit purchased (e.g., 5)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
                         <span className="font-medium text-foreground min-w-24">Image URLs:</span>
                         <span><strong>Optional.</strong> Enter one URL per line. Leave blank if no images.</span>
                       </li>
@@ -172,7 +204,7 @@ export default function AdminProductsPage() {
                   
                   <Alert variant="default">
                     <AlertDescription className="text-sm">
-                      <strong>Tip:</strong> New products are automatically set to "Active" and will appear in the catalog immediately.
+                      <strong>Tip:</strong> New products are automatically set to "Active" and will appear in the catalog immediately. Points are awarded when customers complete their orders.
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -228,13 +260,28 @@ export default function AdminProductsPage() {
                       />
                     </div>
                   </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="category">Category</Label>
-                    <Input
-                      id="category"
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="grid gap-2">
+                      <Label htmlFor="category">Category</Label>
+                      <Input
+                        id="category"
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <Label htmlFor="points">Points per Unit</Label>
+                      <Input
+                        id="points"
+                        type="number"
+                        min="0"
+                        value={formData.points}
+                        onChange={(e) => setFormData({ ...formData, points: e.target.value })}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Loyalty points earned per unit purchased
+                      </p>
+                    </div>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="description">Description</Label>
@@ -305,6 +352,7 @@ export default function AdminProductsPage() {
                     <TableHead>Category</TableHead>
                     <TableHead>Price</TableHead>
                     <TableHead>Stock</TableHead>
+                    <TableHead>Points</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -317,6 +365,7 @@ export default function AdminProductsPage() {
                       <TableCell className="capitalize">{product.category}</TableCell>
                       <TableCell>${Number(product.price)}</TableCell>
                       <TableCell>{Number(product.stock)}</TableCell>
+                      <TableCell>{Number(product.points || 0)}</TableCell>
                       <TableCell>
                         <Badge variant={product.isActive ? 'secondary' : 'outline'}>
                           {product.isActive ? 'Active' : 'Inactive'}

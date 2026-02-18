@@ -1,6 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import type { Product } from '../backend';
+import type { Product, ProductId } from '../backend';
 
 export function useGetAllProducts() {
   const { actor, isFetching } = useActor();
@@ -15,7 +15,7 @@ export function useGetAllProducts() {
   });
 }
 
-export function useGetProduct(productId: bigint) {
+export function useGetProduct(productId: ProductId) {
   const { actor, isFetching } = useActor();
 
   return useQuery<Product>({
@@ -24,7 +24,7 @@ export function useGetProduct(productId: bigint) {
       if (!actor) throw new Error('Actor not available');
       return actor.getProduct(productId);
     },
-    enabled: !!actor && !isFetching,
+    enabled: !!actor && !isFetching && !!productId,
   });
 }
 
@@ -40,6 +40,7 @@ export function useCreateProduct() {
       category: string;
       stock: bigint;
       imageUrls: string[];
+      points: bigint;
     }) => {
       if (!actor) throw new Error('Actor not available');
       return actor.createProduct(
@@ -48,7 +49,8 @@ export function useCreateProduct() {
         data.description,
         data.category,
         data.stock,
-        data.imageUrls
+        data.imageUrls,
+        data.points
       );
     },
     onSuccess: () => {
@@ -63,7 +65,7 @@ export function useUpdateProduct() {
 
   return useMutation({
     mutationFn: async (data: {
-      productId: bigint;
+      productId: ProductId;
       name: string;
       price: bigint;
       description: string;
@@ -71,6 +73,7 @@ export function useUpdateProduct() {
       stock: bigint;
       imageUrls: string[];
       isActive: boolean;
+      points: bigint;
     }) => {
       if (!actor) throw new Error('Actor not available');
       return actor.updateProduct(
@@ -81,7 +84,8 @@ export function useUpdateProduct() {
         data.category,
         data.stock,
         data.imageUrls,
-        data.isActive
+        data.isActive,
+        data.points
       );
     },
     onSuccess: () => {
@@ -95,7 +99,7 @@ export function useToggleProductActive() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (productId: bigint) => {
+    mutationFn: async (productId: ProductId) => {
       if (!actor) throw new Error('Actor not available');
       return actor.toggleProductActive(productId);
     },
@@ -104,5 +108,3 @@ export function useToggleProductActive() {
     },
   });
 }
-
-import { useMutation, useQueryClient } from '@tanstack/react-query';

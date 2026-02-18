@@ -55,6 +55,68 @@ export function useIsAdmin() {
   });
 }
 
+export function useGetCallerPrincipal() {
+  const { actor, isFetching } = useActor();
+  const { identity } = useInternetIdentity();
+  const isAuthenticated = !!identity;
+
+  return useQuery<string>({
+    queryKey: ['callerPrincipal'],
+    queryFn: async () => {
+      if (!actor) return '';
+      return actor.getCallerPrincipal();
+    },
+    enabled: !!actor && !isFetching && isAuthenticated,
+  });
+}
+
+export function useCheckBootstrapAvailable() {
+  const { actor, isFetching } = useActor();
+  const { identity } = useInternetIdentity();
+  const isAuthenticated = !!identity;
+
+  return useQuery<boolean>({
+    queryKey: ['bootstrapAvailable'],
+    queryFn: async () => {
+      if (!actor) return false;
+      try {
+        return await actor.isBootstrapAvailable();
+      } catch (error: any) {
+        if (error.message?.includes('Unauthorized')) {
+          return false;
+        }
+        return false;
+      }
+    },
+    enabled: !!actor && !isFetching && isAuthenticated,
+    retry: false,
+  });
+}
+
+export function useClaimAdminBootstrap() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ password }: { password: string }) => {
+      if (!actor) throw new Error('Actor not available');
+      
+      // Validate password on frontend
+      if (password !== 'miang275@') {
+        throw new Error('Incorrect password');
+      }
+
+      // Request bootstrap (which grants admin access)
+      await actor.requestBootstrap();
+    },
+    onSuccess: () => {
+      // Invalidate admin status and bootstrap availability to trigger re-check
+      queryClient.invalidateQueries({ queryKey: ['isAdmin'] });
+      queryClient.invalidateQueries({ queryKey: ['bootstrapAvailable'] });
+    },
+  });
+}
+
 export function useGetPointsBalance() {
   const { actor, isFetching } = useActor();
   const { identity } = useInternetIdentity();
