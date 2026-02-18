@@ -50,12 +50,13 @@ export interface backendInterface {
     getPointsBalance(): Promise<bigint>;
     getProduct(productId: ProductId): Promise<Product>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    hasAnyAdmin(): Promise<boolean>;
     isBootstrapAvailable(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     placeOrder(): Promise<void>;
     redeemPoints(reward: RedemptionType): Promise<void>;
     removeFromCart(productId: ProductId): Promise<void>;
-    requestBootstrap(): Promise<void>;
+    requestBootstrap(adminPassword: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     toggleProductActive(productId: ProductId): Promise<void>;
     updateProduct(productId: ProductId, name: string, price: bigint, description: string, category: string, stock: bigint, imageUrls: Array<string>, isActive: boolean, points: bigint): Promise<void>;

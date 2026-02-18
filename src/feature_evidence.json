@@ -2,27 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-admin-access-flow-so-an-eligible-user-can-reach-the-admin-password-unlock-screen-instead-of-being-stuck-on-an-access-denied-screen-while-still-requiring-internet-identity-authentication-before-any-admin-access-is-granted",
-      "featureTitle": "Fix the /admin access flow so an eligible user can reach the Admin password unlock screen instead of being stuck on an 'Access Denied' screen, while still requiring Internet Identity authentication before any admin access is granted.",
-      "files": [
-        "frontend/src/components/auth/AdminGate.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-27"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-frontend-bootstrap-claim-ui-and-logic-to-match-the-single-password-admin-bootstrap-requirement-remove-any-username-field-validation-and-ensure-all-user-facing-text-in-this-flow-is-english-and-does-not-mention-a-username",
-      "featureTitle": "Update the frontend bootstrap-claim UI and logic to match the single-password admin bootstrap requirement: remove any username field/validation and ensure all user-facing text in this flow is English and does not mention a username.",
+      "featureId": "feature-update-the-frontend-bootstrap-claim-mutation-to-call-the-corrected-backend-bootstrap-claim-method-including-passing-the-password-if-required-by-the-backend-and-ensure-the-ui-transitions-correctly-after-success-by-invalidating-refetching-admin-status-and-bootstrap-availability-so-the-user-can-proceed-to-the-admin-password-unlock-screen",
+      "featureTitle": "Update the frontend bootstrap-claim mutation to call the corrected backend bootstrap-claim method (including passing the password if required by the backend), and ensure the UI transitions correctly after success by invalidating/refetching admin status and bootstrap availability so the user can proceed to the Admin password unlock screen.",
       "files": [
         "frontend/src/components/auth/AdminGate.tsx",
         "frontend/src/hooks/useQueries.ts"
@@ -36,27 +17,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-28"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-improve-the-access-denied-admin-screen-to-help-diagnose-why-the-user-is-blocked-by-showing-in-english-the-caller-principal-id-with-copy-whether-bootstrap-is-currently-available-and-a-whatsapp-support-cta-to-03280941320-with-a-prefilled-message-containing-the-principal-id",
-      "featureTitle": "Improve the 'Access Denied' admin screen to help diagnose why the user is blocked by showing (in English) the caller Principal ID (with copy), whether bootstrap is currently available, and a WhatsApp support CTA to 03280941320 with a prefilled message containing the Principal ID.",
-      "files": [
-        "frontend/src/components/SupportWhatsAppLink.tsx",
-        "frontend/src/components/auth/AdminGate.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-30"
+        "REQ-39"
       ],
       "confidence": "high"
     }

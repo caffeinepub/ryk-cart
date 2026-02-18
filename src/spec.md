@@ -1,12 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the /admin access flow so eligible users can reach the admin unlock screen, support single-password bootstrap claiming when needed, and provide clearer diagnostics when access is denied.
+**Goal:** Make the admin bootstrap claim flow work end-to-end so “Access Denied” can be resolved and the admin panel becomes reachable without refresh, while enforcing password validation on the backend.
 
 **Planned changes:**
-- Update frontend /admin gating to: prompt Internet Identity login when signed out; show admin password unlock when signed in and backend-recognized as admin; otherwise show an improved Access Denied screen with next steps.
-- Update the frontend bootstrap-claim flow to require only a single password (no username anywhere), use English-only text, and auto re-check admin status after a successful claim (React Query invalidations) so the user can proceed without refreshing.
-- Repair backend bootstrap availability and admin recognition so that when no effective admin exists bootstrap becomes available, claiming bootstrap grants the caller admin privileges for isCallerAdmin and admin-only mutations, and availability is not blocked by stale/incorrect admin initialization state.
-- Enhance the Access Denied UI to display the caller Principal ID (copyable/monospace), show whether bootstrap is available (Yes/No), and include a WhatsApp support CTA to 03280941320 with a prefilled message containing the Principal ID.
+- Fix backend bootstrap claim so a successful claim immediately grants admin permissions in the same session (so isCallerAdmin becomes true and admin-only mutations succeed).
+- Correct backend bootstrap availability logic to be accurate and side-effect-free (only true when an initial admin can still be established; false when an admin exists or after bootstrap is claimed).
+- Enforce admin bootstrap password validation on the backend (password must be `miang275@`) and return clear errors for incorrect passwords.
+- Persist bootstrap-related state across canister upgrades so availability/claimed status remain consistent after redeployments.
+- Update frontend bootstrap-claim call to use the corrected backend method (including passing the password) and refetch/invalidate admin + bootstrap status so the UI transitions to the Admin password unlock screen after success; show clear English errors on failure.
 
-**User-visible outcome:** Visiting /admin now guides the user correctly: signed-out users are asked to sign in with Internet Identity; signed-in admins can unlock and access the Admin Products panel; signed-in non-admins see clear English guidance, bootstrap claim (if available), and a support button that shares their Principal ID via WhatsApp.
+**User-visible outcome:** From `/admin`, an Internet Identity user can claim initial admin access with the correct password and immediately proceed past the Access Denied screen to the Admin unlock screen; incorrect passwords show a clear error and do not grant admin access.

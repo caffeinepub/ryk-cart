@@ -133,12 +133,13 @@ export interface backendInterface {
     getPointsBalance(): Promise<bigint>;
     getProduct(productId: ProductId): Promise<Product>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    hasAnyAdmin(): Promise<boolean>;
     isBootstrapAvailable(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     placeOrder(): Promise<void>;
     redeemPoints(reward: RedemptionType): Promise<void>;
     removeFromCart(productId: ProductId): Promise<void>;
-    requestBootstrap(): Promise<void>;
+    requestBootstrap(adminPassword: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     toggleProductActive(productId: ProductId): Promise<void>;
     updateProduct(productId: ProductId, name: string, price: bigint, description: string, category: string, stock: bigint, imageUrls: Array<string>, isActive: boolean, points: bigint): Promise<void>;
@@ -314,6 +315,20 @@ export class Backend implements backendInterface {
             return from_candid_opt_n3(this._uploadFile, this._downloadFile, result);
         }
     }
+    async hasAnyAdmin(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.hasAnyAdmin();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.hasAnyAdmin();
+            return result;
+        }
+    }
     async isBootstrapAvailable(): Promise<boolean> {
         if (this.processError) {
             try {
@@ -384,17 +399,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async requestBootstrap(): Promise<void> {
+    async requestBootstrap(arg0: string): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.requestBootstrap();
+                const result = await this.actor.requestBootstrap(arg0);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.requestBootstrap();
+            const result = await this.actor.requestBootstrap(arg0);
             return result;
         }
     }

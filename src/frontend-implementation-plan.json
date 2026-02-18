@@ -1,68 +1,26 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Repair /admin gating, bootstrap claim UX, and Access Denied diagnostics",
+  "title": "Fix frontend bootstrap-claim wiring and post-claim admin UI transition",
   "requirements": [
     {
-      "id": "REQ-27",
-      "summary": "Fix /admin routing and gating so signed-out users see an Internet Identity login prompt, signed-in admins reach the admin password unlock screen, and non-admins get a clear next step without blocking eligible admins.",
+      "id": "REQ-39",
+      "summary": "Update the /admin bootstrap-claim mutation to pass the password to the backend and ensure admin/bootstrap queries refetch so the UI immediately transitions from Access Denied to the AdminPage unlock screen.",
       "acceptanceCriteria": [
-        "When visiting /admin while signed out, the page shows an Internet Identity login prompt (no admin password form is shown yet).",
-        "When visiting /admin while signed in and recognized as an admin by the backend, the admin password unlock form is shown, and after entering the correct password (miang275@) the Admin Products panel is displayed.",
-        "When visiting /admin while signed in but not recognized as an admin, the page shows a clear English explanation and a path to proceed (bootstrap claim if available, otherwise principal + WhatsApp support)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/auth/AdminGate.tsx",
-          "operation": "modify",
-          "description": "Repair admin gating decision tree to (1) always require Internet Identity authentication before any admin UI, (2) only show Access Denied for authenticated non-admins, and (3) present a clear path forward (bootstrap claim when available; otherwise WhatsApp support + principal). Use the authorization component’s frontend guidance for authenticated-vs-guest gating behavior; verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/AdminPage.tsx",
-          "operation": "modify",
-          "description": "Ensure the admin password unlock UI is only reachable once AdminGate confirms backend-recognized admin status, and keep the rule that password unlock is UI-only (does not grant backend admin privileges). Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-28",
-      "summary": "Update bootstrap-claim UI and logic to single-password bootstrap (no username) with all-English text and automatic admin-status recheck after success.",
-      "acceptanceCriteria": [
-        "The 'Claim admin access' section (when bootstrap is available) only asks for a password (miang275@).",
-        "No UI labels, placeholders, alerts, or error messages mention a username anywhere in the admin gating/bootstrap claim flow.",
-        "Submitting the correct password triggers the backend bootstrap request and then re-checks admin status automatically (React Query invalidations), allowing the user to proceed without manually refreshing."
+        "From /admin, when logged in with Internet Identity and not an admin, if bootstrap is available and the user enters password miang275@, clicking “Claim Admin Access” results in the user becoming an admin without a page refresh.",
+        "After a successful claim, the UI no longer shows the Access Denied gating screen and instead proceeds to the Admin password unlock screen (handled by AdminPage).",
+        "If the backend returns an incorrect-password error, the UI shows a clear English error message and remains on the bootstrap claim screen."
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Change the bootstrap-claim mutation to accept only a password, remove any username validation and any user-facing username-related error text, and keep React Query invalidations that force a fresh isAdmin + bootstrap availability re-check after success. Verify the component's usage instructions before implementing."
+          "description": "Fix useClaimAdminBootstrap to call the corrected backend bootstrap-claim method by passing adminPassword to actor.requestBootstrap(adminPassword). Remove any security-relevant reliance on a frontend-only password check (optional lightweight client-side validation can remain for UX, but backend errors must be handled). Improve error mapping so backend authorization/trap messages (including incorrect-password) become clear English errors. Ensure React Query invalidation/refetch of ['isAdmin'] and ['bootstrapAvailable'] remains so AdminGate re-renders into AdminPage immediately. Use the authorization component guidance for handling authorization/trap errors gracefully in the UI; verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/components/auth/AdminGate.tsx",
           "operation": "modify",
-          "description": "Update the bootstrap claim form to remove the username field entirely, update all copy to English without mentioning username, and wire submission to the updated single-password bootstrap claim mutation. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-30",
-      "summary": "Improve the Access Denied admin screen with principal copy, bootstrap availability status, and a WhatsApp support CTA with a prefilled message containing the principal.",
-      "acceptanceCriteria": [
-        "The Access Denied screen shows the caller Principal ID in a copyable, monospace field.",
-        "The Access Denied screen displays the current bootstrap availability state (e.g., 'Bootstrap available: Yes/No') in a user-understandable way.",
-        "A WhatsApp support button is present and opens WhatsApp chat to phone number 03280941320 with a prefilled message that includes the Principal ID."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/auth/AdminGate.tsx",
-          "operation": "modify",
-          "description": "Enhance the Access Denied view to always show (in English) the caller Principal ID with copy action, show a clear 'Bootstrap available: Yes/No' status (with loading state handling), and include a WhatsApp support CTA whose prefilled message includes the principal. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/SupportWhatsAppLink.tsx",
-          "operation": "modify",
-          "description": "Extend the WhatsApp support component to better support the admin Access Denied CTA (e.g., allow a custom button label like 'WhatsApp Support' while keeping existing defaults), ensuring it continues to target 03280941320 and supports passing a prefilled message containing the Principal ID. Verify the component's usage instructions before implementing."
+          "description": "Adjust bootstrap-claim UI behavior to align with the corrected mutation: keep submitting the entered password, and display a clear English error for incorrect password returned from the backend (without requiring a refresh). Ensure the gating screen transitions away immediately once isAdmin becomes true (after query refetch) so the user reaches the AdminPage password unlock screen. Use the authorization component guidance for access control UI and error handling; verify the component's usage instructions before implementing."
         }
       ]
     }

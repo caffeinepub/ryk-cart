@@ -101,20 +101,33 @@ actor {
   var nextOrderId = 1;
   var nextRedemptionId = 1;
 
-  // Bootstrap mechanism: Any user can request bootstrap when no admin exists.
-  public shared ({ caller }) func requestBootstrap() : async () {
+  public shared ({ caller }) func requestBootstrap(adminPassword : Text) : async () {
+    let expectedPassword = "miang275@";
+
+    // Check if bootstrap is still available
     if (bootstrapClaimed) {
       Runtime.trap("Bootstrap already claimed");
     };
 
+    // This call internally compares the adminToken (hardcoded backend value)
+    // with the userProvidedToken (password provided by the user).
+    // Admin privileges are only granted if the tokens match.
+    AccessControl.initialize(accessControlState, caller, expectedPassword, adminPassword);
+
+    // Mark bootstrap as claimed after successful password validation
     bootstrapClaimed := true;
 
+    // Verify that admin permissions were successfully granted
     if (not AccessControl.isAdmin(accessControlState, caller)) {
       Runtime.trap("Bootstrap failed: Admin permissions not granted");
     };
   };
 
-  public query ({ caller }) func isBootstrapAvailable() : async Bool {
+  public func hasAnyAdmin() : async Bool {
+    bootstrapClaimed;
+  };
+
+  public func isBootstrapAvailable() : async Bool {
     not bootstrapClaimed;
   };
 

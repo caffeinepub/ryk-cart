@@ -100,19 +100,31 @@ export function useClaimAdminBootstrap() {
   return useMutation({
     mutationFn: async ({ password }: { password: string }) => {
       if (!actor) throw new Error('Actor not available');
-      
-      // Validate password on frontend
-      if (password !== 'miang275@') {
-        throw new Error('Incorrect password');
-      }
 
-      // Request bootstrap (which grants admin access)
-      await actor.requestBootstrap();
+      try {
+        // Pass the password to the backend for validation
+        await actor.requestBootstrap(password);
+      } catch (error: any) {
+        // Map backend errors to user-friendly messages
+        const errorMsg = error.message || String(error);
+        
+        if (errorMsg.includes('Bootstrap already claimed')) {
+          throw new Error('Admin access has already been claimed by another user');
+        } else if (errorMsg.includes('Unauthorized') || errorMsg.includes('password')) {
+          throw new Error('Incorrect password. Please try again.');
+        } else if (errorMsg.includes('Bootstrap failed')) {
+          throw new Error('Failed to grant admin permissions. Please try again.');
+        } else {
+          throw new Error('Failed to claim admin access. Please check your password and try again.');
+        }
+      }
     },
-    onSuccess: () => {
-      // Invalidate admin status and bootstrap availability to trigger re-check
-      queryClient.invalidateQueries({ queryKey: ['isAdmin'] });
-      queryClient.invalidateQueries({ queryKey: ['bootstrapAvailable'] });
+    onSuccess: async () => {
+      // Invalidate and immediately refetch admin status and bootstrap availability
+      await queryClient.invalidateQueries({ queryKey: ['isAdmin'] });
+      await queryClient.invalidateQueries({ queryKey: ['bootstrapAvailable'] });
+      await queryClient.refetchQueries({ queryKey: ['isAdmin'] });
+      await queryClient.refetchQueries({ queryKey: ['bootstrapAvailable'] });
     },
   });
 }

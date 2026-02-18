@@ -1,11 +1,14 @@
 import Map "mo:core/Map";
 import Set "mo:core/Set";
-import Nat "mo:core/Nat";
+import Time "mo:core/Time";
+import Int "mo:core/Int";
 import Principal "mo:core/Principal";
 
 module {
+  type ProductId = Nat;
+
   type Product = {
-    id : Nat;
+    id : ProductId;
     name : Text;
     price : Nat;
     description : Text;
@@ -17,16 +20,18 @@ module {
   };
 
   type CartItem = {
-    productId : Nat;
+    productId : ProductId;
     quantity : Nat;
   };
 
+  type OrderId = Nat;
+
   type Order = {
-    id : Nat;
+    id : OrderId;
     user : Principal;
     items : [CartItem];
     total : Nat;
-    timestamp : Int;
+    timestamp : Time.Time;
   };
 
   type RedemptionType = {
@@ -39,7 +44,7 @@ module {
     user : Principal;
     points : Nat;
     reward : RedemptionType;
-    timestamp : Int;
+    timestamp : Time.Time;
   };
 
   type UserProfile = {
@@ -47,24 +52,22 @@ module {
   };
 
   type OldActor = {
-    adminInitialized : Bool;
-    bootstrapRequested : Bool;
-    bootstrapRequestedBy : ?Principal;
-    products : Map.Map<Nat, Product>;
+    products : Map.Map<ProductId, Product>;
     carts : Map.Map<Principal, Set.Set<CartItem>>;
-    orders : Map.Map<Nat, Order>;
+    orders : Map.Map<OrderId, Order>;
     loyaltyPoints : Map.Map<Principal, Nat>;
     redemptions : Map.Map<Nat, Redemption>;
     userProfiles : Map.Map<Principal, UserProfile>;
     nextProductId : Nat;
     nextOrderId : Nat;
     nextRedemptionId : Nat;
+    bootstrapClaimed : Bool;
   };
 
   type NewActor = {
-    products : Map.Map<Nat, Product>;
+    products : Map.Map<ProductId, Product>;
     carts : Map.Map<Principal, Set.Set<CartItem>>;
-    orders : Map.Map<Nat, Order>;
+    orders : Map.Map<OrderId, Order>;
     loyaltyPoints : Map.Map<Principal, Nat>;
     redemptions : Map.Map<Nat, Redemption>;
     userProfiles : Map.Map<Principal, UserProfile>;
@@ -75,17 +78,6 @@ module {
   };
 
   public func run(old : OldActor) : NewActor {
-    {
-      products = old.products;
-      carts = old.carts;
-      orders = old.orders;
-      loyaltyPoints = old.loyaltyPoints;
-      redemptions = old.redemptions;
-      userProfiles = old.userProfiles;
-      nextProductId = old.nextProductId;
-      nextOrderId = old.nextOrderId;
-      nextRedemptionId = old.nextRedemptionId;
-      bootstrapClaimed = false;
-    };
+    old;
   };
 };

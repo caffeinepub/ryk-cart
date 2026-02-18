@@ -1,58 +1,54 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-18T05:14:54.854Z",
+  "generatedAt": "2026-02-18T05:48:58.934Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 3,
+    "total": 5,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-27",
-        "summary": "Fix the /admin access flow so an eligible user can reach the Admin password unlock screen instead of being stuck on an 'Access Denied' screen, while still requiring Internet Identity authentication before any admin access is granted.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/auth/AdminGate.tsx",
-          "frontend/src/pages/AdminPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/auth/AdminGate.tsx"
-        ]
-      },
-      {
-        "id": "REQ-28",
-        "summary": "Update the frontend bootstrap-claim UI and logic to match the single-password admin bootstrap requirement: remove any username field/validation and ensure all user-facing text in this flow is English and does not mention a username.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/auth/AdminGate.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/auth/AdminGate.tsx"
-        ]
-      },
-      {
-        "id": "REQ-29",
-        "summary": "Repair backend admin bootstrap availability/admin recognition so that if no effective admin exists, bootstrap is available and successfully claiming bootstrap immediately grants the caller admin permissions that satisfy isCallerAdmin and admin-only mutations.",
+        "id": "REQ-35",
+        "summary": "Fix the backend admin bootstrap flow so that when bootstrap is available, successfully claiming bootstrap grants the caller admin permissions immediately (so subsequent calls to isCallerAdmin return true and admin-only mutations like createProduct/updateProduct/toggleProductActive succeed), instead of trapping with \"Bootstrap failed: Admin permissions not granted\".",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
-        "id": "REQ-30",
-        "summary": "Improve the 'Access Denied' admin screen to help diagnose why the user is blocked by showing (in English) the caller Principal ID (with copy), whether bootstrap is currently available, and a WhatsApp support CTA to 03280941320 with a prefilled message containing the Principal ID.",
+        "id": "REQ-36",
+        "summary": "Update the backend bootstrap availability logic to be accurate and side-effect-free: return true only when an initial admin can still be established (e.g., no effective admin exists yet and bootstrap has not been claimed), and return false otherwise.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-37",
+        "summary": "Require the admin bootstrap claim to validate the admin password (miang275@) on the backend (not only on the frontend), and return a clear error when the password is incorrect.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-38",
+        "summary": "Persist bootstrap-related state across canister upgrades so that bootstrap availability and whether it has been claimed remain consistent after redeployments/upgrades.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-39",
+        "summary": "Update the frontend bootstrap-claim mutation to call the corrected backend bootstrap-claim method (including passing the password if required by the backend), and ensure the UI transitions correctly after success by invalidating/refetching admin status and bootstrap availability so the user can proceed to the Admin password unlock screen.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/auth/AdminGate.tsx",
-          "frontend/src/components/SupportWhatsAppLink.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/auth/AdminGate.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/auth/AdminGate.tsx",
-          "frontend/src/components/SupportWhatsAppLink.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/auth/AdminGate.tsx"
         ]
       }
     ]
@@ -66,7 +62,6 @@
     "frontend-implementation-plan.json",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
-    "frontend/src/components/SupportWhatsAppLink.tsx",
     "frontend/src/components/auth/AdminGate.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",

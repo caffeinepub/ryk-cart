@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 17,
+  "projectStateVersion": 21,
   "summary": "Build an e-commerce website similar to Daraz, named \"Ryk cart\", with WhatsApp-based complaints/support and a purchase-based loyalty points system that rewards users at 20 points with cashback or a mystery box gift.",
   "architectural_notes": [
     "Provide a WhatsApp contact link/button for complaints/support using the provided phone number.",
@@ -12,7 +12,9 @@
   "known_issues": [
     "Admin login/unlock entry point is not visible to the user (admin login screen not showing).",
     "Admin panel currently shows 'Access Denied' for the user; admin unlock/password screen is not reachable.",
-    "User reports /admin still shows \"Access Denied\" (even after Version 7 / single-password admin login deployment)."
+    "User reports /admin still shows \"Access Denied\" (even after Version 7 / single-password admin login deployment).",
+    "After Version 8 release, user reports admin panel still not working (still blocked / not resolved).",
+    "After Version 9 deployment, user reports the admin panel still does not work / is still blocked (\"abhi bhi nhi ho rha\")."
   ],
   "isFixRequest": true,
   "existing_features": [
@@ -231,6 +233,30 @@
         "REQ-30"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-frontend-bootstrap-claim-mutation-to-call-the-corrected-backend-bootstrap-method-and-pass-the-password-if-the-backend-requires-it-and-ensure-the-ui-transitions-correctly-after-success-invalidate-refetch-admin-status-and-bootstrap-availability-then-allow-the-user-to-proceed-to-the-admin-password-unlock-screen-and-or-product-management-as-appropriate",
+      "title": "Update the frontend bootstrap-claim mutation to call the corrected backend bootstrap method (and pass the password if the backend requires it), and ensure the UI transitions correctly after success (invalidate/refetch admin status and bootstrap availability, then allow the user to proceed to the Admin password unlock screen and/or product management as appropriate).",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-end-to-end-self-check-in-the-admin-gating-ui-for-debugging-visible-only-in-the-admin-gating-screens-that-clearly-shows-authenticated-status-current-isadmin-value-current-bootstrapavailable-value-and-the-last-bootstrap-claim-error-message-if-any-all-in-english",
+      "title": "Add an end-to-end self-check in the /admin gating UI for debugging (visible only in the admin gating screens) that clearly shows: authenticated status, current isAdmin value, current bootstrapAvailable value, and the last bootstrap claim error message (if any), all in English.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-frontend-bootstrap-claim-mutation-to-call-the-corrected-backend-bootstrap-claim-method-including-passing-the-password-if-required-by-the-backend-and-ensure-the-ui-transitions-correctly-after-success-by-invalidating-refetching-admin-status-and-bootstrap-availability-so-the-user-can-proceed-to-the-admin-password-unlock-screen",
+      "title": "Update the frontend bootstrap-claim mutation to call the corrected backend bootstrap-claim method (including passing the password if required by the backend), and ensure the UI transitions correctly after success by invalidating/refetching admin status and bootstrap availability so the user can proceed to the Admin password unlock screen.",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -297,6 +323,54 @@
       "summary": "Repair backend admin bootstrap availability/admin recognition so that if no effective admin exists, bootstrap is available and successfully claiming bootstrap immediately grants the caller admin permissions that satisfy isCallerAdmin and admin-only mutations.",
       "reqIds": [
         "REQ-29"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Fix the backend admin bootstrap logic so that when bootstrap is available and the correct password is provided, the caller is actually granted admin permissions (so subsequent calls to isCallerAdmin return true and admin-only mutations like createProduct/updateProduct/toggleProductActive succeed).",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Update the backend bootstrap availability query so it is accurate: it must return true only when an initial admin can still be established (for example: no effective admin exists yet and bootstrap has not been claimed), and return false otherwise.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Fix the backend admin bootstrap flow so that when bootstrap is available, successfully claiming bootstrap grants the caller admin permissions immediately (so subsequent calls to isCallerAdmin return true and admin-only mutations like createProduct/updateProduct/toggleProductActive succeed), instead of trapping with \"Bootstrap failed: Admin permissions not granted\".",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Update the backend bootstrap availability logic to be accurate and side-effect-free: return true only when an initial admin can still be established (e.g., no effective admin exists yet and bootstrap has not been claimed), and return false otherwise.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Require the admin bootstrap claim to validate the admin password (miang275@) on the backend (not only on the frontend), and return a clear error when the password is incorrect.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Persist bootstrap-related state across canister upgrades so that bootstrap availability and whether it has been claimed remain consistent after redeployments/upgrades.",
+      "reqIds": [
+        "REQ-38"
       ],
       "status": "pending"
     }

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ShieldAlert, LogIn, Loader2, Copy, Check, AlertCircle } from 'lucide-react';
+import { ShieldAlert, LogIn, Loader2, Copy, Check, AlertCircle, CheckCircle2, Bug } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { toast } from 'sonner';
@@ -24,6 +24,8 @@ export default function AdminGate({ children }: AdminGateProps) {
   
   const [copied, setCopied] = useState(false);
   const [bootstrapPassword, setBootstrapPassword] = useState('');
+  const [claimSuccess, setClaimSuccess] = useState(false);
+  const [lastBootstrapError, setLastBootstrapError] = useState<string | null>(null);
   
   const isAuthenticated = !!identity;
   const isLoggingIn = loginStatus === 'logging-in';
@@ -39,19 +41,62 @@ export default function AdminGate({ children }: AdminGateProps) {
 
   const handleClaimAdmin = (e: React.FormEvent) => {
     e.preventDefault();
+    setLastBootstrapError(null);
     claimAdminMutation.mutate(
       { password: bootstrapPassword },
       {
         onSuccess: () => {
           toast.success('Admin access claimed successfully!');
           setBootstrapPassword('');
+          setClaimSuccess(true);
+          setLastBootstrapError(null);
         },
         onError: (error: any) => {
-          toast.error(error.message || 'Failed to claim admin access');
+          const errorMessage = error.message || 'Failed to claim admin access';
+          setLastBootstrapError(errorMessage);
+          toast.error(errorMessage);
         },
       }
     );
   };
+
+  // Debug panel component (only shown in gating flows)
+  const DebugPanel = () => (
+    <div className="mt-6 p-4 bg-muted/50 rounded-lg border border-border">
+      <div className="flex items-center gap-2 mb-3">
+        <Bug className="h-4 w-4 text-muted-foreground" />
+        <h4 className="text-sm font-medium">Self-Check Debug Info</h4>
+      </div>
+      <div className="space-y-2 text-xs font-mono">
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Authenticated:</span>
+          <span className={isAuthenticated ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+            {isAuthenticated ? 'Yes' : 'No'}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Is Admin:</span>
+          <span className={isAdmin ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+            {isAdminLoading ? 'Loading...' : isAdmin ? 'Yes' : 'No'}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Bootstrap Available:</span>
+          <span className={bootstrapAvailable ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}>
+            {bootstrapLoading ? 'Loading...' : bootstrapAvailable ? 'Yes' : 'No'}
+          </span>
+        </div>
+        {lastBootstrapError && (
+          <div className="pt-2 border-t border-border">
+            <span className="text-muted-foreground">Last Bootstrap Error:</span>
+            <div className="mt-1 text-red-600 dark:text-red-400 break-words">
+              {lastBootstrapError}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
   // Show loading skeleton while checking authentication and admin status
   if (isAdminLoading || (isAuthenticated && (bootstrapLoading || principalLoading))) {
@@ -81,6 +126,9 @@ export default function AdminGate({ children }: AdminGateProps) {
               {isLoggingIn && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               {isLoggingIn ? 'Logging in...' : 'Log In with Internet Identity'}
             </Button>
+          </CardContent>
+          <CardContent>
+            <DebugPanel />
           </CardContent>
         </Card>
       </div>
@@ -142,8 +190,28 @@ export default function AdminGate({ children }: AdminGateProps) {
               </div>
             </div>
 
+            {/* Success State */}
+            {claimSuccess && (
+              <Alert className="border-green-600 dark:border-green-400 bg-green-50 dark:bg-green-950">
+                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <AlertDescription className="text-green-800 dark:text-green-200">
+                  Admin access claimed successfully! The page should update automatically.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Error State */}
+            {lastBootstrapError && !claimSuccess && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  {lastBootstrapError}
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* Bootstrap Claim or Support Contact */}
-            {bootstrapAvailable ? (
+            {bootstrapAvailable && !claimSuccess ? (
               <div className="space-y-4">
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
@@ -176,7 +244,7 @@ export default function AdminGate({ children }: AdminGateProps) {
                   </Button>
                 </form>
               </div>
-            ) : (
+            ) : !claimSuccess ? (
               <div className="space-y-4">
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
@@ -198,7 +266,7 @@ export default function AdminGate({ children }: AdminGateProps) {
                   />
                 </div>
               </div>
-            )}
+            ) : null}
 
             {/* Troubleshooting */}
             <div className="pt-4 border-t">
@@ -209,6 +277,9 @@ export default function AdminGate({ children }: AdminGateProps) {
                 <li>Try logging out and logging back in</li>
               </ul>
             </div>
+
+            {/* Debug Panel */}
+            <DebugPanel />
           </CardContent>
         </Card>
       </div>

@@ -1,96 +1,121 @@
 {
   "kind": "build_request",
-  "title": "Fix /admin 'Access Denied' by repairing admin gating and bootstrap claim flow",
+  "title": "Fix admin bootstrap so Access Denied can be resolved and admin panel becomes reachable",
   "projectName": "Ryk cart",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-27",
-      "text": "Fix the /admin access flow so an eligible user can reach the Admin password unlock screen instead of being stuck on an 'Access Denied' screen, while still requiring Internet Identity authentication before any admin access is granted.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "access denied hi arha hy"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When visiting /admin while signed out, the page shows an Internet Identity login prompt (no admin password form is shown yet).",
-        "When visiting /admin while signed in and recognized as an admin by the backend, the admin password unlock form is shown, and after entering the correct password (miang275@) the Admin Products panel is displayed.",
-        "When visiting /admin while signed in but not recognized as an admin, the page shows a clear English explanation and a path to proceed (bootstrap claim if available, otherwise principal + WhatsApp support)."
-      ]
-    },
-    {
-      "id": "REQ-28",
-      "text": "Update the frontend bootstrap-claim UI and logic to match the single-password admin bootstrap requirement: remove any username field/validation and ensure all user-facing text in this flow is English and does not mention a username.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "access denied hi arha hy"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The 'Claim admin access' section (when bootstrap is available) only asks for a password (miang275@).",
-        "No UI labels, placeholders, alerts, or error messages mention a username anywhere in the admin gating/bootstrap claim flow.",
-        "Submitting the correct password triggers the backend bootstrap request and then re-checks admin status automatically (React Query invalidations), allowing the user to proceed without manually refreshing."
-      ]
-    },
-    {
-      "id": "REQ-29",
-      "text": "Repair backend admin bootstrap availability/admin recognition so that if no effective admin exists, bootstrap is available and successfully claiming bootstrap immediately grants the caller admin permissions that satisfy isCallerAdmin and admin-only mutations.",
+      "id": "REQ-35",
+      "text": "Fix the backend admin bootstrap flow so that when bootstrap is available, successfully claiming bootstrap grants the caller admin permissions immediately (so subsequent calls to isCallerAdmin return true and admin-only mutations like createProduct/updateProduct/toggleProductActive succeed), instead of trapping with \"Bootstrap failed: Admin permissions not granted\".",
       "target": "backend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "access denied hi arha hy"
+          "abhi bhi nhi ho rha"
         ]
       },
       "acceptanceCriteria": [
-        "If the system has no effective admin configured, the backend bootstrap availability query returns true for an authenticated caller.",
-        "After calling requestBootstrap successfully, subsequent calls to isCallerAdmin for the same caller return true.",
-        "After successful bootstrap, the caller can perform admin-only mutations (createProduct/updateProduct/toggleProductActive) without receiving 'Unauthorized' traps.",
-        "The bootstrap availability logic does not incorrectly return false due only to stale/incorrect adminInitialized state."
+        "Given no admin is effectively configured and bootstrap is available, calling the bootstrap-claim method succeeds and the caller becomes an admin in the same session.",
+        "After a successful bootstrap claim, a call to isCallerAdmin returns true for that caller.",
+        "After a successful bootstrap claim, admin-only mutations (createProduct/updateProduct/toggleProductActive) succeed for that caller (assuming Internet Identity authentication is present).",
+        "If bootstrap has already been claimed (or is otherwise unavailable), attempting to claim bootstrap fails with a clear error and does not change admin status."
       ]
     },
     {
-      "id": "REQ-30",
-      "text": "Improve the 'Access Denied' admin screen to help diagnose why the user is blocked by showing (in English) the caller Principal ID (with copy), whether bootstrap is currently available, and a WhatsApp support CTA to 03280941320 with a prefilled message containing the Principal ID.",
+      "id": "REQ-36",
+      "text": "Update the backend bootstrap availability logic to be accurate and side-effect-free: return true only when an initial admin can still be established (e.g., no effective admin exists yet and bootstrap has not been claimed), and return false otherwise.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "abhi bhi nhi ho rha"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The bootstrap availability query does not modify state.",
+        "Bootstrap availability returns false when an admin already exists, even if bootstrapClaimed is false.",
+        "Bootstrap availability returns false after bootstrap has been successfully claimed."
+      ]
+    },
+    {
+      "id": "REQ-37",
+      "text": "Require the admin bootstrap claim to validate the admin password (miang275@) on the backend (not only on the frontend), and return a clear error when the password is incorrect.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "abhi bhi nhi ho rha"
+        ]
+      },
+      "acceptanceCriteria": [
+        "If the password is incorrect, the backend bootstrap claim fails and does not grant admin permissions and does not mark bootstrap as claimed.",
+        "If the password is correct and bootstrap is available, the backend bootstrap claim succeeds and grants admin permissions to the caller.",
+        "No frontend-only password check is relied on for security (frontend may still do client-side validation for UX, but backend must enforce it)."
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "text": "Persist bootstrap-related state across canister upgrades so that bootstrap availability and whether it has been claimed remain consistent after redeployments/upgrades.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "abhi bhi nhi ho rha"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After an upgrade, bootstrap availability and claimed status reflect the pre-upgrade values (no accidental reset that re-opens bootstrap or re-locks an already bootstrapped admin)."
+      ]
+    },
+    {
+      "id": "REQ-39",
+      "text": "Update the frontend bootstrap-claim mutation to call the corrected backend bootstrap-claim method (including passing the password if required by the backend), and ensure the UI transitions correctly after success by invalidating/refetching admin status and bootstrap availability so the user can proceed to the Admin password unlock screen.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "access denied hi arha hy"
+          "abhi bhi nhi ho rha"
         ]
       },
       "acceptanceCriteria": [
-        "The Access Denied screen shows the caller Principal ID in a copyable, monospace field.",
-        "The Access Denied screen displays the current bootstrap availability state (e.g., 'Bootstrap available: Yes/No') in a user-understandable way.",
-        "A WhatsApp support button is present and opens WhatsApp chat to phone number 03280941320 with a prefilled message that includes the Principal ID."
+        "From /admin, when logged in with Internet Identity and not an admin, if bootstrap is available and the user enters password miang275@, clicking “Claim Admin Access” results in the user becoming an admin without a page refresh.",
+        "After a successful claim, the UI no longer shows the Access Denied gating screen and instead proceeds to the Admin password unlock screen (handled by AdminPage).",
+        "If the backend returns an incorrect-password error, the UI shows a clear English error message and remains on the bootstrap claim screen."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo; add backend/migration.mo only if a state upgrade is required.",
-    "Do not edit any frontend files under the immutablePaths list in SYSTEM_CONTEXT.",
-    "Use English for all user-facing text changed or added as part of this build request.",
-    "Keep the existing rule that admin product mutations must still require backend-recognized admin privileges (password unlock alone must not grant backend admin permissions)."
+    "Backend must remain a single Motoko actor in backend/main.mo; do not introduce additional backend services.",
+    "Do not edit any frontend files under frontend/src/components/ui or other immutablePaths specified in SYSTEM_CONTEXT.",
+    "Use English for all user-facing text."
   ],
   "nonGoals": [
-    "Adding new authentication providers beyond Internet Identity.",
-    "Implementing real-time features (WebSockets/chat).",
+    "Implementing non-Internet-Identity authentication for admin access.",
+    "Adding external databases or third-party auth providers.",
     "Changing the admin password value (must remain miang275@)."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }
