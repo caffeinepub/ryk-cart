@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 3,
+  "projectStateVersion": 5,
   "summary": "Build an e-commerce website similar to Daraz, named \"Ryk cart\", with WhatsApp-based complaints/support and a purchase-based loyalty points system that rewards users at 20 points with cashback or a mystery box gift.",
   "architectural_notes": [
     "Provide a WhatsApp contact link/button for complaints/support using the provided phone number.",
@@ -8,7 +8,6 @@
   ],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Minimal cart + lightning bolt logo mark, flat vector style (ryk-cart-logo.dim_512x512.png)\n- Wide hero banner illustration for an online shopping storefront, warm modern palette (ryk-cart-hero.dim_1600x600.png)\n- Set of 6 category icons (electronics, fashion, groceries, beauty, home, toys), consistent line/flat style (ryk-cart-category-icons.dim_512x512.png)\n- Mystery box gift illustration, playful but clean (ryk-cart-mystery-box.dim_800x800.png)",
   "existing_features": [
     {
       "id": "feature-create-a-daraz-like-e-commerce-web-app-called-ryk-cart-with-core-browsing-and-shopping-flows-product-listing-product-details-cart-management-and-order-placement",
@@ -73,6 +72,30 @@
         "REQ-8"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-clear-empty-state-experience-on-the-catalog-shop-page-when-there-are-zero-active-products-explaining-that-no-products-are-available-yet-and-guiding-an-admin-to-add-products-via-the-admin-product-management-page",
+      "title": "Add a clear empty-state experience on the Catalog (Shop) page when there are zero active products, explaining that no products are available yet and guiding an admin to add products via the Admin → Product Management page.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-small-always-available-how-to-add-products-help-entry-point-for-admins-that-explains-the-minimum-steps-to-create-a-product-name-price-category-stock-optional-image-urls-and-where-to-find-product-management",
+      "title": "Add a small, always-available 'How to add products' help entry point for admins that explains the minimum steps to create a product (name, price, category, stock, optional image URLs) and where to find Product Management.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-improve-the-admin-products-page-table-empty-loading-states-so-an-admin-can-immediately-tell-whether-products-are-missing-vs-still-loading",
+      "title": "Improve the Admin Products page table empty/loading states so an admin can immediately tell whether products are missing vs. still loading.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -97,6 +120,12 @@
     {
       "id": "AR-4",
       "summary": "Add rewards redemption at 20 points (cashback or mystery box gift)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Provide a way to add/manage products (admin product creation/editing interface) so the marketplace has items to display",
       "reqIds": [],
       "status": "pending"
     }

@@ -1,301 +1,55 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Ryk cart frontend: marketplace browsing, cart/checkout, II auth, WhatsApp support, rewards, admin UI, and theming",
+  "title": "Admin-friendly empty states for catalog and product management",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Implement core storefront flows (catalog/search/categories, product details, cart, checkout + confirmation, order history screen) wired to existing backend capabilities.",
+      "id": "REQ-9",
+      "summary": "Add a guided empty-state on the Catalog (Shop) page when there are zero active products, with admin-aware call-to-action to go to Product Management.",
       "acceptanceCriteria": [
-        "Users can browse a product catalog with categories and search.",
-        "Users can open a product detail page with images, price, description, and an Add to Cart action.",
-        "Users can view and edit the cart (change quantity, remove items) and see subtotal/total.",
-        "Users can place an order (no external payment required) and receive an order confirmation.",
-        "Placed orders are persisted per authenticated user and visible in an Order History screen."
+        "When there are no active products, the Catalog page shows an empty-state panel instead of only the generic 'No products found' text.",
+        "The empty state includes English guidance that products must be added from the Admin area (e.g., “If you are an admin, go to Admin → Product Management to add products.”).",
+        "If the current user is an admin (based on the existing isAdmin query), the empty state includes a visible button that navigates to /admin.",
+        "If the current user is not an admin, the empty state does not show an Admin navigation button and instead shows a short note indicating the admin area is restricted."
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "create",
-          "description": "Create the app shell and client-side routing for the required screens: Catalog, Product Details, Cart, Checkout/Place Order, Order Confirmation, Order History, Loyalty/Rewards, and Admin. Ensure navigation wiring exists so no screens are orphaned."
-        },
-        {
-          "path": "frontend/src/components/layout/AppShell.tsx",
-          "operation": "create",
-          "description": "Create a shared layout with consistent header/footer, primary navigation links, and a main content container used across all pages (marketplace-friendly structure)."
-        },
         {
           "path": "frontend/src/pages/CatalogPage.tsx",
-          "operation": "create",
-          "description": "Implement product listing UI with category filtering and search (English UI text). Use backend getAllProducts() and hide inactive products in the UI."
-        },
-        {
-          "path": "frontend/src/pages/ProductDetailsPage.tsx",
-          "operation": "create",
-          "description": "Implement product details UI (images carousel/stack, price, description, stock indicator) and Add to Cart action via backend getProduct() and addToCart()."
-        },
-        {
-          "path": "frontend/src/pages/CartPage.tsx",
-          "operation": "create",
-          "description": "Implement cart UI (list items, change quantity, remove item, subtotal/total). Wire to backend getCart(), addToCart() (for quantity changes), and removeFromCart()."
-        },
-        {
-          "path": "frontend/src/pages/CheckoutPage.tsx",
-          "operation": "create",
-          "description": "Implement order placement UI (review cart + place order button, no payment). Call backend placeOrder() and navigate to an order confirmation view on success."
-        },
-        {
-          "path": "frontend/src/pages/OrderConfirmationPage.tsx",
-          "operation": "create",
-          "description": "Implement a simple order confirmation screen with next actions (continue shopping, view order history)."
-        },
-        {
-          "path": "frontend/src/pages/OrderHistoryPage.tsx",
-          "operation": "create",
-          "description": "Implement an Order History screen UI. Integrate with the backend order-history capability (if not yet exposed in the typed frontend interface, call via a safe runtime check and show a clear fallback message)."
-        },
-        {
-          "path": "frontend/src/hooks/useProducts.ts",
-          "operation": "create",
-          "description": "Add React Query hooks for products (catalog + product details) using getAllProducts() and getProduct() to keep data fetching consistent."
-        },
-        {
-          "path": "frontend/src/hooks/useCart.ts",
-          "operation": "create",
-          "description": "Add React Query hooks for cart read/write operations using getCart(), addToCart(), and removeFromCart(), including cache invalidation to keep totals correct."
+          "operation": "modify",
+          "description": "Use the existing isAdmin query (via useIsAdmin from frontend/src/hooks/useQueries.ts) to render a dedicated empty-state panel when activeProducts.length === 0. Show English guidance to add products via Admin → Product Management; if isAdmin is true, show a Button that navigates to /admin; if isAdmin is false, omit the button and show a short note that the admin area is restricted. Keep the existing 'No products found' behavior for cases where products exist but filters/search return no matches. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-2",
-      "summary": "Add Internet Identity authentication and gate order placement, order history, and rewards behind sign-in (browsing remains public).",
+      "id": "REQ-10",
+      "summary": "Add an always-available 'How to add products' help entry point for admins on the Admin Products page explaining minimal product creation steps and where Product Management lives.",
       "acceptanceCriteria": [
-        "Unauthenticated users can browse products and view product details.",
-        "Attempting to place an order prompts the user to sign in with Internet Identity.",
-        "After sign-in, the user can access Order History and Loyalty/Rewards pages."
+        "Admins can access a short help UI (e.g., a link/button in the Admin Products page header or a compact callout) that explains, in English, how to add products.",
+        "The help content explicitly mentions that the Admin page is at /admin and the primary action is the existing “Add Product” button.",
+        "The help content mentions that image URLs are entered one per line and are optional.",
+        "No changes are required to Internet Identity hooks or immutable paths to deliver this help UI."
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/components/auth/LoginButton.tsx",
-          "operation": "create",
-          "description": "Implement a header login/logout button using the selected authorization component’s frontend guidance (Internet Identity + clearing React Query cache on logout). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/auth/ProfileSetupDialog.tsx",
-          "operation": "create",
-          "description": "Implement first-login profile setup (ask for user name in English) using authorization component guidance with getCallerUserProfile() and saveCallerUserProfile(). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/auth/AuthGate.tsx",
-          "operation": "create",
-          "description": "Create a reusable wrapper that requires Internet Identity authentication for protected screens/actions and shows a sign-in prompt when unauthenticated (per acceptance criteria). Use authorization component patterns. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/CheckoutPage.tsx",
-          "operation": "modify",
-          "description": "Require authentication before calling placeOrder(): wrap the place-order section with AuthGate and prompt sign-in when unauthenticated."
-        },
-        {
-          "path": "frontend/src/pages/OrderHistoryPage.tsx",
-          "operation": "modify",
-          "description": "Require authentication to view Order History using AuthGate (browsing pages remain accessible)."
-        },
-        {
-          "path": "frontend/src/pages/RewardsPage.tsx",
-          "operation": "create",
-          "description": "Create the Loyalty/Rewards page and ensure it is protected by AuthGate (only authenticated users can access points and redemptions)."
-        },
-        {
-          "path": "frontend/src/components/layout/AppShell.tsx",
-          "operation": "modify",
-          "description": "Wire LoginButton and profile setup flow into the shared header/account area; ensure English UI text and that cached app data is cleared on logout per authorization component guidance. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Add a WhatsApp Support/Complaints entry that opens a wa.me chat to 03280941320 with a prefilled English message.",
-      "acceptanceCriteria": [
-        "A visible \"Support / Complaints\" UI entry exists (e.g., header and/or footer).",
-        "Clicking the entry opens WhatsApp (wa.me link) to 03280941320.",
-        "The WhatsApp link includes a prefilled English message (e.g., \"Hello Ryk cart support, I need help with my order...\")."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/SupportWhatsAppLink.tsx",
-          "operation": "create",
-          "description": "Create a reusable Support / Complaints link component that builds a wa.me URL for phone 03280941320 with a prefilled English message template."
-        },
-        {
-          "path": "frontend/src/components/layout/AppShell.tsx",
-          "operation": "modify",
-          "description": "Add the Support / Complaints entry to a visible global location (header and/or footer) using SupportWhatsAppLink."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Display and persist loyalty points by showing balance in Rewards screen and a small badge/summary in the account area; clarify the earn rule in UI.",
-      "acceptanceCriteria": [
-        "When an order is placed successfully, the user earns points according to a clearly defined rule (documented in UI, e.g., 1 point per product item purchased).",
-        "The user can view current points in a Loyalty/Rewards screen and in a small summary badge (e.g., in account menu).",
-        "Points balance is persisted and remains correct after refresh and re-login."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useRewards.ts",
-          "operation": "create",
-          "description": "Add React Query hooks for loyalty points using backend getPointsBalance() and redeemPoints(), including refetch/invalidation after order placement and redemption."
-        },
-        {
-          "path": "frontend/src/pages/RewardsPage.tsx",
-          "operation": "modify",
-          "description": "Show current points balance and document the earning rule in English (UI copy only). Fetch points via useRewards (getPointsBalance())."
-        },
-        {
-          "path": "frontend/src/components/layout/AccountSummary.tsx",
-          "operation": "create",
-          "description": "Create an account summary UI element (e.g., in header menu) that shows the user name (from profile) and a small loyalty points badge. Use authorization component patterns for profile retrieval. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/layout/AppShell.tsx",
-          "operation": "modify",
-          "description": "Wire AccountSummary into the header/account area so points are visible globally for authenticated users."
-        },
-        {
-          "path": "frontend/src/pages/CheckoutPage.tsx",
-          "operation": "modify",
-          "description": "After a successful placeOrder(), trigger points refetch (and any order-history refetch) so the new balance shows immediately on Rewards and in the header badge."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Enable redeeming exactly 20 points for Cashback or Mystery Box when eligible, and show redemption history in the Rewards area.",
-      "acceptanceCriteria": [
-        "When points >= 20, the Rewards screen shows two redeem options: \"Cashback\" and \"Mystery Box\".",
-        "Redeeming deducts exactly 20 points from the user balance and creates a redemption record with type, timestamp, and status.",
-        "If points < 20, redeem actions are disabled with a clear explanation (in English).",
-        "Users can view a list of past redemptions (history) in the Loyalty/Rewards area."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/RewardsPage.tsx",
-          "operation": "modify",
-          "description": "Implement redeem UI with two options (Cashback, Mystery Box), enabled only when points >= 20; otherwise disable with an English explanation. Call backend redeemPoints() with the correct RedemptionType and refetch points on success."
-        },
-        {
-          "path": "frontend/src/components/rewards/RedemptionHistory.tsx",
-          "operation": "create",
-          "description": "Create a redemption history list component for the Rewards page. Integrate with the backend redemption-history capability (if not yet exposed in the typed frontend interface, call via a safe runtime check and show a clear fallback message)."
-        },
-        {
-          "path": "frontend/src/hooks/useRewards.ts",
-          "operation": "modify",
-          "description": "Add client-side support for redemption history fetching (when backend capability is available) and ensure caches update after successful redemption."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Add an admin-only product management UI to create, edit, and deactivate products and keep public catalog free of inactive items.",
-      "acceptanceCriteria": [
-        "There is an Admin section accessible only to an allowlisted admin principal (configured in backend).",
-        "Admin can create and update products and set them active/inactive.",
-        "Inactive products do not appear in the public catalog.",
-        "Product changes persist across refreshes."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/auth/AdminGate.tsx",
-          "operation": "create",
-          "description": "Create an admin-only route guard that checks backend isCallerAdmin() and shows an access denied UI when unauthorized. Use authorization component patterns for handling authorization failures gracefully. Verify the component's usage instructions before implementing."
-        },
         {
           "path": "frontend/src/pages/AdminProductsPage.tsx",
-          "operation": "create",
-          "description": "Implement admin product management UI to create and edit products (name, price, description, category, stock, images) and toggle active/inactive using backend createProduct(), updateProduct(), toggleProductActive(), and getAllProducts()."
-        },
-        {
-          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Wire the AdminProductsPage route and wrap it with AdminGate so only admins can access it; add a navigation link that only renders for admins."
-        },
-        {
-          "path": "frontend/src/pages/CatalogPage.tsx",
-          "operation": "modify",
-          "description": "Ensure the public catalog UI filters out inactive products (isActive === false) even if returned by getAllProducts()."
+          "description": "Add a compact, always-visible help entry point for admins in the page header (e.g., a small Button that opens a Dialog). The help content must be in English and briefly list the minimum steps (name, price, category, stock, optional image URLs) and explicitly state that Product Management is at /admin and that the primary action is the existing “Add Product” button. Explicitly mention image URLs are optional and entered one per line. Do not modify Internet Identity hooks. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-7",
-      "summary": "Apply a coherent distinctive theme (not Daraz-copy) with consistent typography/spacing/navigation; avoid blue+purple as the primary combination.",
+      "id": "REQ-11",
+      "summary": "Improve Admin Products table loading and empty states so admins can distinguish loading vs no products, without breaking existing table actions.",
       "acceptanceCriteria": [
-        "A consistent color palette, typography scale, and layout system is used across the app.",
-        "Key pages (Home/Catalog, Product Detail, Cart, Checkout/Place Order, Account, Loyalty/Rewards, Admin) share consistent navigation and visual hierarchy.",
-        "Theme avoids using a blue+purple primary combination unless explicitly requested later."
+        "While loading, the Admin Products page shows a clear loading indicator in the table area.",
+        "When loading is complete and there are no products, the Admin Products page shows an explicit empty state (in English) such as “No products yet. Click ‘Add Product’ to create your first product.”",
+        "When products exist, the current table rendering remains functional (edit and activate/deactivate actions still work)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/index.css",
-          "operation": "create",
-          "description": "Add global styles and Tailwind CSS variables for a warm modern palette (avoiding blue+purple primary), consistent typography scale, and spacing conventions used across the app."
-        },
-        {
-          "path": "frontend/tailwind.config.js",
+          "path": "frontend/src/pages/AdminProductsPage.tsx",
           "operation": "modify",
-          "description": "Adjust theme extensions (colors/typography tokens as needed) to support the new brand palette and consistent UI styling across pages."
-        },
-        {
-          "path": "frontend/src/components/layout/AppShell.tsx",
-          "operation": "modify",
-          "description": "Ensure shared navigation structure and visual hierarchy are consistent across all required pages using composed shadcn/ui components (do not edit immutable ui component files)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "summary": "Add required generated static brand/UI images under frontend/public/assets/generated and render them in the UI without backend fetching.",
-      "acceptanceCriteria": [
-        "Generated images exist in frontend/public/assets/generated and are referenced by the UI (e.g., logo in header, hero banner on home).",
-        "The UI works without fetching images from the backend."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/public/assets/generated/ryk-cart-logo.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated static image asset at frontend/public/assets/generated/ryk-cart-logo.dim_512x512.png so it can be referenced directly by the UI."
-        },
-        {
-          "path": "frontend/public/assets/generated/ryk-cart-hero.dim_1600x600.png",
-          "operation": "create",
-          "description": "Add the generated static image asset at frontend/public/assets/generated/ryk-cart-hero.dim_1600x600.png so it can be referenced directly by the UI."
-        },
-        {
-          "path": "frontend/public/assets/generated/ryk-cart-category-icons.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated static image asset at frontend/public/assets/generated/ryk-cart-category-icons.dim_512x512.png so it can be referenced directly by the UI."
-        },
-        {
-          "path": "frontend/public/assets/generated/ryk-cart-mystery-box.dim_800x800.png",
-          "operation": "create",
-          "description": "Add the generated static image asset at frontend/public/assets/generated/ryk-cart-mystery-box.dim_800x800.png so it can be referenced directly by the UI."
-        },
-        {
-          "path": "frontend/src/components/layout/AppShell.tsx",
-          "operation": "modify",
-          "description": "Render the logo using frontend/public/assets/generated/ryk-cart-logo.dim_512x512.png in the header and include consistent brand presentation across pages."
-        },
-        {
-          "path": "frontend/src/pages/CatalogPage.tsx",
-          "operation": "modify",
-          "description": "Render the hero banner using frontend/public/assets/generated/ryk-cart-hero.dim_1600x600.png and show category iconography using frontend/public/assets/generated/ryk-cart-category-icons.dim_512x512.png within the catalog UI."
-        },
-        {
-          "path": "frontend/src/pages/RewardsPage.tsx",
-          "operation": "modify",
-          "description": "Render the mystery box illustration using frontend/public/assets/generated/ryk-cart-mystery-box.dim_800x800.png near the Mystery Box redemption option."
+          "description": "Update the CardContent/table rendering to (1) show a clear loading indicator within the table area while isLoading is true (e.g., a spinner row or table-area skeleton), and (2) after loading, if products is empty, show an explicit English empty-state message (e.g., “No products yet. Click ‘Add Product’ to create your first product.”) in the table area. Preserve the existing table and row actions when products exist. Verify the component's usage instructions before implementing."
         }
       ]
     }

@@ -1,17 +1,20 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useGetAllProducts } from '../hooks/useProducts';
+import { useIsAdmin } from '../hooks/useQueries';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Search, ShoppingCart } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Search, ShoppingCart, PackageOpen, ShieldAlert } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function CatalogPage() {
   const navigate = useNavigate();
   const { data: products, isLoading } = useGetAllProducts();
+  const { data: isAdmin, isLoading: isAdminLoading } = useIsAdmin();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -32,6 +35,11 @@ export default function CatalogPage() {
       return matchesSearch && matchesCategory;
     });
   }, [activeProducts, searchQuery, selectedCategory]);
+
+  // Show empty state when there are no active products at all (not just filtered)
+  const showEmptyState = !isLoading && activeProducts.length === 0;
+  // Show "no results" when products exist but filters return nothing
+  const showNoResults = !isLoading && activeProducts.length > 0 && filteredProducts.length === 0;
 
   return (
     <div className="min-h-screen">
@@ -86,9 +94,48 @@ export default function CatalogPage() {
               </Card>
             ))}
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : showEmptyState ? (
+          <div className="flex items-center justify-center py-16">
+            <Card className="max-w-2xl w-full">
+              <CardHeader className="text-center">
+                <div className="flex justify-center mb-4">
+                  <PackageOpen className="h-16 w-16 text-muted-foreground" />
+                </div>
+                <CardTitle className="text-2xl">No Products Available Yet</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert>
+                  <ShieldAlert className="h-4 w-4" />
+                  <AlertTitle>Products need to be added</AlertTitle>
+                  <AlertDescription>
+                    Products must be added from the Admin area before they can appear in the catalog.
+                  </AlertDescription>
+                </Alert>
+                
+                {!isAdminLoading && isAdmin && (
+                  <div className="text-center pt-4">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      You are an admin. Go to Admin → Product Management to add products.
+                    </p>
+                    <Button onClick={() => navigate({ to: '/admin' })}>
+                      Go to Admin Panel
+                    </Button>
+                  </div>
+                )}
+                
+                {!isAdminLoading && !isAdmin && (
+                  <div className="text-center pt-4">
+                    <p className="text-sm text-muted-foreground">
+                      The admin area is restricted. Please contact an administrator to add products.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        ) : showNoResults ? (
           <div className="text-center py-16">
-            <p className="text-muted-foreground">No products found</p>
+            <p className="text-muted-foreground">No products found matching your search or filters</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
